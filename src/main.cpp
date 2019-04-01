@@ -73,6 +73,7 @@ void gpio_init() {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 
 	// init step pin PA0 and clock pin PA8 both on alternate function
 	gpio_init.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_8;
@@ -132,6 +133,7 @@ void parallel_clock_timer_init() {
 	outputChannelInit.TIM_OCPolarity = TIM_OCPolarity_High;
 	TIM_OC1Init(TIM1, &outputChannelInit);
 	TIM_OC1PreloadConfig(TIM1, TIM_OCPreload_Enable);
+	TIM_CtrlPWMOutputs(TIM1, ENABLE);
 
 	NVIC_InitTypeDef nvicStructure;
 	nvicStructure.NVIC_IRQChannel = TIM1_CC_IRQn;
@@ -155,16 +157,16 @@ void motor_timer_init() {
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 
 	TIM_TimeBaseInitTypeDef timerInitStructure;
-	timerInitStructure.TIM_Prescaler = 720;								// target frequency for TIM2: 100 kHz
+	timerInitStructure.TIM_Prescaler = 71;								// target frequency for TIM2: 1 MHz
 	timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	timerInitStructure.TIM_Period = 10000;								// for 10 Hz step frequency. gets adjusted to match current pitch
+	timerInitStructure.TIM_Period = 1000;								// for 1 kHz step frequency. gets adjusted to match current pitch
 	timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	timerInitStructure.TIM_RepetitionCounter = 0;
 	TIM_TimeBaseInit(TIM2, &timerInitStructure);
 
-	TIM_OCInitTypeDef outputChannelInit = {0,};
+	TIM_OCInitTypeDef outputChannelInit;
 	outputChannelInit.TIM_OCMode = TIM_OCMode_PWM2;						// set active low if counter > pulse
-	outputChannelInit.TIM_Pulse = 5000;									// 50 % doodie cycle - also adjusted according to pitch
+	outputChannelInit.TIM_Pulse = 500;									// 50 % doodie cycle - also adjusted according to pitch
 	outputChannelInit.TIM_OutputState = TIM_OutputState_Enable;
 	outputChannelInit.TIM_OCPolarity = TIM_OCPolarity_High;
 	TIM_OC1Init(TIM2, &outputChannelInit);
