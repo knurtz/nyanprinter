@@ -90,19 +90,19 @@ void gpio_init() {
     GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_SET);		// motor enable is active low
     GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_SET); 	// latch is active low
 
-    // init step pin PB4
+    // init strobe pin PB4
 	gpio_init.GPIO_Pin = GPIO_Pin_4;
-	gpio_init.GPIO_Mode = GPIO_Mode_AF_PP;			// output, but controlled by TIM3
+	gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;			// output, but controlled by TIM3
 	gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOB, &gpio_init);
-
-	// init parallel data pins PB8-PB15
+/*
+	//init parallel data pins PB8-PB15
 	gpio_init.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14;
 	gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;			// normal output, put ODR is written by DMA1, channel 2
 	gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOB, &gpio_init);
     GPIO_WriteBit(GPIOB, GPIO_Pin_14, Bit_RESET);	// initialize motor dir pin
-
+*/
 	// init LED pin PC13 (onboard LED)
 	gpio_init.GPIO_Pin = GPIO_Pin_13;
 	gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;			// normal output
@@ -148,7 +148,8 @@ void parallel_clock_timer_init() {
 
 	TIM_SelectOnePulseMode(TIM1, TIM_OPMode_Single);					// only fire once (each time with 64 repetitions)
 
-	TIM_Cmd(TIM1, DISABLE);												// will be activated by code later
+	TIM_Cmd(TIM1, DISABLE);						// will be activated by code later
+
 }
 
 // TIM2 creates motor steps: TIM2 Channel 1 -> PA0 (step signal)
@@ -159,14 +160,14 @@ void motor_timer_init() {
 	TIM_TimeBaseInitTypeDef timerInitStructure;
 	timerInitStructure.TIM_Prescaler = 71;								// target frequency for TIM2: 1 MHz
 	timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	timerInitStructure.TIM_Period = 1000;								// for 1 kHz step frequency. gets adjusted to match current pitch
+	timerInitStructure.TIM_Period = 1500;								// for 1 kHz step frequency. gets adjusted to match current pitch
 	timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	timerInitStructure.TIM_RepetitionCounter = 0;
 	TIM_TimeBaseInit(TIM2, &timerInitStructure);
 
 	TIM_OCInitTypeDef outputChannelInit;
 	outputChannelInit.TIM_OCMode = TIM_OCMode_PWM2;						// set active low if counter > pulse
-	outputChannelInit.TIM_Pulse = 500;									// 50 % doodie cycle - also adjusted according to pitch
+	outputChannelInit.TIM_Pulse = 750;									// 50 % doodie cycle - also adjusted according to pitch
 	outputChannelInit.TIM_OutputState = TIM_OutputState_Enable;
 	outputChannelInit.TIM_OCPolarity = TIM_OCPolarity_High;
 	TIM_OC1Init(TIM2, &outputChannelInit);
@@ -250,14 +251,14 @@ int main(void) {
 		TIM_Cmd(TIM1, ENABLE);
 
 		// manually trigger latch for a few us -> data gets transferred from shift registers to strobes
-	    GPIO_WriteBit(GPIOB, GPIO_Pin_14, Bit_RESET);
+	    GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_RESET);
 	    delay_usec(100);
-	    GPIO_WriteBit(GPIOB, GPIO_Pin_14, Bit_SET);
+	    GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_SET);
 
 	    // manually trigger strobe for 1000 us
-	    GPIO_WriteBit(GPIOB, GPIO_Pin_14, Bit_SET);
+	    GPIO_WriteBit(GPIOB, GPIO_Pin_4, Bit_SET);
 		delay_usec(1000);
-		GPIO_WriteBit(GPIOB, GPIO_Pin_14, Bit_RESET);
+		GPIO_WriteBit(GPIOB, GPIO_Pin_4, Bit_RESET);
 
 		// forward motor a bit
 		GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_RESET);	// enable motor driver
