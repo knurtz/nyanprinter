@@ -14,7 +14,7 @@ This is the solution I came up with: If the printer encounters a line with more 
 ## Hardware
 
 - STM32F103 Bluepill Development Board: [stm32duino.com](https://wiki.stm32duino.com/index.php?title=Blue_Pill)
-- Thermal printer from [pollin.de](https://www.pollin.de/p/thermo-druckelement-matsushita-epl1801s2e-721066)
+- Thermal printer MATSUSHITA EPL1801S2E from [pollin.de](https://www.pollin.de/p/thermo-druckelement-matsushita-epl1801s2e-721066)
 - an awesome huge blue push button from [Amazon](https://www.amazon.de/gp/product/B07BSFMZJ2) (it lights up, too!)
 - A4988 stepper motor driver board like this one from [pololu.com](https://www.pololu.com/product/1182)
 - RECOM R-78E5.0-0.5 DC/DC converter from [conrad.de](https://www.conrad.de/de/recom-r-78e50-05-dcdc-wandler-print-24-vdc-5-vdc-500-ma-anzahl-ausgaenge-1-x-157954.html?)
