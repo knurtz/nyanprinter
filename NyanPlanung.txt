@@ -52,7 +52,7 @@ DMA1 Channel 3:
     - one-pulse mode (64 Wiederholungen, ergibt eine Bildzeile)
     - nach 64 Wiederholungen: Interrupt für Latch
 
-    TIM2:s
+    TIM2:
     - generiert Schrittimpulse für den Motor -> TIM2_CH1-Output an step-Pin
     - Frequenz: 10 kHz
     - Zählperiode: entsprechend für Frequenz der aktuellen Note
