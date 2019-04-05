@@ -14,16 +14,7 @@
 #include "config.h"
 #include "delay.h"
 
-uint8_t test_picture [8][64] = {
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
-};
+#include "test_picture.h"
 
 // TIM2 update event: switch between activating strobe (TIM3) or data transfer (TIM1)
 extern "C" void TIM2_IRQHandler()
@@ -32,6 +23,16 @@ extern "C" void TIM2_IRQHandler()
     {
         TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
         GPIO_WriteBit(GPIOC, GPIO_Pin_13, GPIO_ReadOutputDataBit(GPIOC, GPIO_Pin_13) ? Bit_RESET : Bit_SET);
+    }
+}
+
+// turn on LED if dma error occurred
+extern "C" void DMA1_Channel2_IRQHandler()
+{
+    if (DMA_GetFlagStatus(DMA1_FLAG_TE2) != RESET)
+    {
+    	DMA_ClearFlag(DMA1_FLAG_TE2);
+        GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_RESET);
     }
 }
 
@@ -95,14 +96,14 @@ void gpio_init() {
 	gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;			// output, but controlled by TIM3
 	gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOB, &gpio_init);
-/*
-	//init parallel data pins PB8-PB15
+
+	//init parallel data pins PB8 - PB13 and motor direction pin PB14
 	gpio_init.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14;
 	gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;			// normal output, put ODR is written by DMA1, channel 2
 	gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOB, &gpio_init);
-    GPIO_WriteBit(GPIOB, GPIO_Pin_14, Bit_RESET);	// initialize motor dir pin
-*/
+    GPIO_WriteBit(GPIOB, GPIO_Pin_14, Bit_SET);	// initialize motor dir pin
+
 	// init LED pin PC13 (onboard LED)
 	gpio_init.GPIO_Pin = GPIO_Pin_13;
 	gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;			// normal output
@@ -160,14 +161,14 @@ void motor_timer_init() {
 	TIM_TimeBaseInitTypeDef timerInitStructure;
 	timerInitStructure.TIM_Prescaler = 71;								// target frequency for TIM2: 1 MHz
 	timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	timerInitStructure.TIM_Period = 1500;								// for 1 kHz step frequency. gets adjusted to match current pitch
+	timerInitStructure.TIM_Period = 6000;								// for 1 kHz step frequency. gets adjusted to match current pitch
 	timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	timerInitStructure.TIM_RepetitionCounter = 0;
 	TIM_TimeBaseInit(TIM2, &timerInitStructure);
 
 	TIM_OCInitTypeDef outputChannelInit;
 	outputChannelInit.TIM_OCMode = TIM_OCMode_PWM2;						// set active low if counter > pulse
-	outputChannelInit.TIM_Pulse = 750;									// 50 % doodie cycle - also adjusted according to pitch
+	outputChannelInit.TIM_Pulse = 3000;									// 50 % doodie cycle - also adjusted according to pitch
 	outputChannelInit.TIM_OutputState = TIM_OutputState_Enable;
 	outputChannelInit.TIM_OCPolarity = TIM_OCPolarity_High;
 	TIM_OC1Init(TIM2, &outputChannelInit);
@@ -180,7 +181,7 @@ void motor_timer_init() {
 	nvicStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&nvicStructure);
 
-	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);							// TIM2 update ISR triggers data transfer (TIM1) or strobe (TIM3)
+	//TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);							// TIM2 update ISR triggers data transfer (TIM1) or strobe (TIM3)
 
 	TIM_Cmd(TIM2, DISABLE);												// will be activated by code later
 }
@@ -216,18 +217,29 @@ void picture_dma_init() {
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 
 	DMA_InitTypeDef dmaInitStructure;
-	dmaInitStructure.DMA_BufferSize = 512;								// 8 * 64 byte for text_picture
+	dmaInitStructure.DMA_BufferSize = test_picture_length;								// 8 * 64 byte for text_picture
 	dmaInitStructure.DMA_DIR = DMA_DIR_PeripheralDST;					// peripheral (GPIO) is destination
 	dmaInitStructure.DMA_M2M = DMA_M2M_Disable;
-	dmaInitStructure.DMA_MemoryBaseAddr = (uint32_t)&test_picture;		// transfer image data
+	dmaInitStructure.DMA_MemoryBaseAddr = (uint32_t)test_picture;		// transfer image data
 	dmaInitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
 	dmaInitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
 	dmaInitStructure.DMA_Mode = DMA_Mode_Circular;
-	dmaInitStructure.DMA_PeripheralBaseAddr = (uint32_t)(&GPIOB->ODR);	// output data register of GPIOB is used
-	dmaInitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
+	dmaInitStructure.DMA_PeripheralBaseAddr = (uint32_t)((&GPIOB->ODR));	// output data register of GPIOB is used
+	dmaInitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
 	dmaInitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
 	dmaInitStructure.DMA_Priority = DMA_Priority_High;
 	DMA_Init(DMA1_Channel2, &dmaInitStructure);
+	DMA_Cmd(DMA1_Channel2, ENABLE);
+
+	// transfer error interrupt for debugging
+	NVIC_InitTypeDef nvicStructure;
+	nvicStructure.NVIC_IRQChannel = DMA1_Channel2_IRQn;
+	nvicStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	nvicStructure.NVIC_IRQChannelSubPriority = 1;
+	nvicStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&nvicStructure);
+	DMA_ITConfig(DMA1_Channel2, DMA_IT_TE, ENABLE);
+
 }
 
 
@@ -263,12 +275,12 @@ int main(void) {
 		// forward motor a bit
 		GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_RESET);	// enable motor driver
 		TIM_Cmd(TIM2, ENABLE);
-		delay_msec(1000);
+		delay_msec(200);
 		TIM_Cmd(TIM2, DISABLE);
 	    GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_SET);		// disable onboard LED
 	    GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_SET);		// disable motor driver
 
-		delay_sec(5);
+		delay_sec(2);
 
 	}
 
