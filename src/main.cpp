@@ -14,7 +14,7 @@
 #include "config.h"
 #include "delay.h"
 
-#include "test_picture.h"
+#include "image_test.h"
 
 // TIM2 update event: switch between activating strobe (TIM3) or data transfer (TIM1)
 extern "C" void TIM2_IRQHandler()
@@ -48,21 +48,21 @@ extern "C" void TIM1_CC_IRQHandler()
 }
 */
 
-// manipulate picture data on a pixel level
+// manipulate image data on a pixel level
 // pixel to byte assignment is weird due to the way the printer gets its data (6 serial interfaces in parallel)
 // only the 6 LSBs in each byte are picture data
 // bit 6 is for motor direction and bit 7 is for latch. They only matter on the very last byte per line, so in picture[y][63]
-void picture_set_pixel(uint8_t picture[][64], int line, int pixel, bool value) {
+void image_set_pixel(uint8_t image[][64], int line, int pixel, bool value) {
 
-	if (value) picture[line][pixel%64] |= (1<<(pixel/64));
-	else picture[line][pixel%64] &= ~(1<<(pixel/64));
+	if (value) image[line][pixel%64] |= (1<<(pixel/64));
+	else image[line][pixel%64] &= ~(1<<(pixel/64));
 
 }
 
-void picture_set_line(uint8_t picture[][64], int line, bool value) {
+void image_set_line(uint8_t image[][64], int line, bool value) {
 
-	if (value) for (int i = 0; i < 64; i++) picture[line][i] = 0b11111111;
-	else for (int i = 0; i < 64; i++) picture[line][i] = 0;
+	if (value) for (int i = 0; i < 64; i++) image[line][i] = 0b11111111;
+	else for (int i = 0; i < 64; i++) image[line][i] = 0;
 
 }
 
@@ -96,6 +96,8 @@ void gpio_init() {
 	gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;			// output, but controlled by TIM3
 	gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOB, &gpio_init);
+    GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_RESET); 	// strobe is active high
+
 
 	//init parallel data pins PB8 - PB13 and motor direction pin PB14
 	gpio_init.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14;
@@ -122,14 +124,14 @@ void parallel_clock_timer_init() {
 	TIM_TimeBaseInitTypeDef timerInitStructure;
 	timerInitStructure.TIM_Prescaler = 0;								// target frequency for TIM1: 72 MHz
 	timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	timerInitStructure.TIM_Period = 72;									// timer update with a frequency of 1 MHz
+	timerInitStructure.TIM_Period = 71;									// timer update with a frequency of 1 MHz
 	timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	timerInitStructure.TIM_RepetitionCounter = 63;						// 64 cycles for one chunk of picture data
 	TIM_TimeBaseInit(TIM1, &timerInitStructure);
 
 	TIM_OCInitTypeDef outputChannelInit = {0,};
 	outputChannelInit.TIM_OCMode = TIM_OCMode_PWM1;						// set active high if counter > pulse
-	outputChannelInit.TIM_Pulse = 36;									// 50 % doodie cycle
+	outputChannelInit.TIM_Pulse = 35;									// 50 % doodie cycle
 	outputChannelInit.TIM_OutputState = TIM_OutputState_Enable;
 	outputChannelInit.TIM_OCPolarity = TIM_OCPolarity_High;
 	TIM_OC1Init(TIM1, &outputChannelInit);
@@ -181,7 +183,7 @@ void motor_timer_init() {
 	nvicStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&nvicStructure);
 
-	//TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);							// TIM2 update ISR triggers data transfer (TIM1) or strobe (TIM3)
+	//TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);						// TIM2 update ISR triggers data transfer (TIM1) or strobe (TIM3)
 
 	TIM_Cmd(TIM2, DISABLE);												// will be activated by code later
 }
@@ -217,10 +219,10 @@ void picture_dma_init() {
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 
 	DMA_InitTypeDef dmaInitStructure;
-	dmaInitStructure.DMA_BufferSize = test_picture_length;								// 8 * 64 byte for text_picture
+	dmaInitStructure.DMA_BufferSize = image_test_length;								// 8 * 64 byte for text_picture
 	dmaInitStructure.DMA_DIR = DMA_DIR_PeripheralDST;					// peripheral (GPIO) is destination
 	dmaInitStructure.DMA_M2M = DMA_M2M_Disable;
-	dmaInitStructure.DMA_MemoryBaseAddr = (uint32_t)test_picture;		// transfer image data
+	dmaInitStructure.DMA_MemoryBaseAddr = (uint32_t)image_test;		// transfer image data
 	dmaInitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
 	dmaInitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
 	dmaInitStructure.DMA_Mode = DMA_Mode_Circular;
@@ -243,7 +245,6 @@ void picture_dma_init() {
 }
 
 
-
 int main(void) {
 
 	SystemInit();
@@ -257,10 +258,12 @@ int main(void) {
 	//strobe_timer_init();
 
 
-
 	while(1) {
 		// trigger TIM1 once, it should do 64 repetitions, triggering DMA1 each time -> one line of picture data should get transferred to printer
 		TIM_Cmd(TIM1, ENABLE);
+
+		// wait 0.5 ms for transfer to complete (64 transmission at 1 MHz should only take 64 us
+		delay_usec(500);
 
 		// manually trigger latch for a few us -> data gets transferred from shift registers to strobes
 	    GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_RESET);

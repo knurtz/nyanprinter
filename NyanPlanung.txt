@@ -14,7 +14,7 @@ GPIOA:
 GPIOB:
 - genutzt für parallele Datenübertragungen an Drucker
 - High byte des ODR-Registers wird von DMA1 Channel 2 beschrieben
-- genutzte Pins: PB8 - PB15 (6x parallele Daten, 1x dir-Pin des Motors, 1x ungenutzt)
+- genutzte Pins: PB8 - PB15 (6x parallele Daten, 1x dir-Pin des Motors, 1x latch, falls nicht manuell gesetzt)
 - TIM3 Channel 1: PB4 (strobe-Signal)
 
 SPI1:
