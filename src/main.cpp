@@ -70,48 +70,42 @@ void image_set_line(uint8_t image[][64], int line, bool value) {
 void gpio_init() {
 
 	GPIO_InitTypeDef gpio_init;
+	gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 
-	// init step pin PA0 and clock pin PA8 both on alternate function
+	// init step pin PA0 and clock pin PA8, both on alternate function
 	gpio_init.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_8;
 	gpio_init.GPIO_Mode = GPIO_Mode_AF_PP;			// output, but controlled by TIM1 / TIM2
-	gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &gpio_init);
 
-
-	// latch pin PA11 and motor enable pin PA4
+	// init motor enable pin PA4 and latch pin PA11
 	gpio_init.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_11;
 	gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;			// normal output
-	gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &gpio_init);
-    GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_SET);		// motor enable is active low
-    GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_SET); 	// latch is active low
+	GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_SET);		// motor enable is active low
+	GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_SET); 	// latch is active low
 
     // init strobe pin PB4
 	gpio_init.GPIO_Pin = GPIO_Pin_4;
-	gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;			// output, but controlled by TIM3
-	gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
+	gpio_init.GPIO_Mode = GPIO_Mode_AF_PP;			// output, but controlled by TIM3
 	GPIO_Init(GPIOB, &gpio_init);
-    GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_RESET); 	// strobe is active high
-
+	GPIO_WriteBit(GPIOB, GPIO_Pin_4, Bit_RESET); 	// strobe is active high
 
 	//init parallel data pins PB8 - PB13 and motor direction pin PB14
 	gpio_init.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14;
 	gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;			// normal output, put ODR is written by DMA1, channel 2
-	gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOB, &gpio_init);
-    GPIO_WriteBit(GPIOB, GPIO_Pin_14, Bit_SET);	// initialize motor dir pin
+	GPIO_WriteBit(GPIOB, GPIO_Pin_14, Bit_RESET);		// initialize motor dir pin
 
 	// init LED pin PC13 (onboard LED)
 	gpio_init.GPIO_Pin = GPIO_Pin_13;
 	gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;			// normal output
-	gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOC, &gpio_init);
-    GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_SET);		// active low
+	GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_SET);		// active low
 
 }
 
@@ -196,7 +190,7 @@ void strobe_timer_init() {
 	TIM_TimeBaseInitTypeDef timerInitStructure;
 	timerInitStructure.TIM_Prescaler = (SystemCoreClock / 1000000) - 1;		// target frequency for TIM3: 1 MHz -> 1 us per tick
 	timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	timerInitStructure.TIM_Period = 750;								// 750 us strobe length should suffice at 8 volts... maybe 1000 is necessary
+	timerInitStructure.TIM_Period = 1000;								// 1000 us strobe length should suffice at 8 volts... maybe 1000 is necessary
 	timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	timerInitStructure.TIM_RepetitionCounter = 0;						// 1 cycle, then stop because in oe pulse mode
 	TIM_TimeBaseInit(TIM3, &timerInitStructure);
@@ -255,7 +249,7 @@ int main(void) {
 	motor_timer_init();
 	parallel_clock_timer_init();
 	picture_dma_init();
-	//strobe_timer_init();
+	strobe_timer_init();
 
 
 	while(1) {
@@ -270,21 +264,20 @@ int main(void) {
 	    delay_usec(100);
 	    GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_SET);
 
-	    // manually trigger strobe for 1000 us
-	    GPIO_WriteBit(GPIOB, GPIO_Pin_4, Bit_SET);
-		delay_usec(1000);
-		GPIO_WriteBit(GPIOB, GPIO_Pin_4, Bit_RESET);
+	    // manually trigger strobe
+	    TIM_Cmd(TIM3, ENABLE);
+	    delay_usec(1000);		// wait for strobe to finish
 
-		// forward motor a bit
-		GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_RESET);	// enable motor driver
-		TIM_Cmd(TIM2, ENABLE);
-		delay_msec(200);
+	    // move forward a little bit
+	    GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_RESET);	// enable motor driver
+	    TIM_Cmd(TIM2, ENABLE);
+	    delay_msec(200);
 		TIM_Cmd(TIM2, DISABLE);
-	    GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_SET);		// disable onboard LED
 	    GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_SET);		// disable motor driver
 
-		delay_sec(2);
+	    GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_SET);		// disable onboard LED
 
+		delay_sec(2);
 	}
 
 	return 0;
