@@ -26,12 +26,12 @@ extern "C" void TIM2_IRQHandler()
     }
 }
 
-// turn on LED if dma error occurred
+// turn on LED on DMA transfer complete
 extern "C" void DMA1_Channel2_IRQHandler()
 {
-    if (DMA_GetFlagStatus(DMA1_FLAG_TE2) != RESET)
+    if (DMA_GetFlagStatus(DMA1_FLAG_TC2) != RESET)
     {
-    	DMA_ClearFlag(DMA1_FLAG_TE2);
+    	DMA_ClearFlag(DMA1_FLAG_TC2);
         GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_RESET);
     }
 }
@@ -87,7 +87,7 @@ void gpio_init() {
 	gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;			// normal output
 	GPIO_Init(GPIOA, &gpio_init);
 	GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_SET);		// motor enable is active low
-	GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_SET); 	// latch is active low
+	GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_RESET); 	// latch is active high because of level shifting transistor
 
     // init strobe pin PB4
 	gpio_init.GPIO_Pin = GPIO_Pin_4;
@@ -123,7 +123,7 @@ void parallel_clock_timer_init() {
 	timerInitStructure.TIM_RepetitionCounter = 63;						// 64 cycles for one chunk of picture data
 	TIM_TimeBaseInit(TIM1, &timerInitStructure);
 
-	TIM_OCInitTypeDef outputChannelInit = {0,};
+	TIM_OCInitTypeDef outputChannelInit;
 	outputChannelInit.TIM_OCMode = TIM_OCMode_PWM1;						// set active high if counter > pulse
 	outputChannelInit.TIM_Pulse = 35;									// 50 % doodie cycle
 	outputChannelInit.TIM_OutputState = TIM_OutputState_Enable;
@@ -190,14 +190,14 @@ void strobe_timer_init() {
 	TIM_TimeBaseInitTypeDef timerInitStructure;
 	timerInitStructure.TIM_Prescaler = (SystemCoreClock / 1000000) - 1;		// target frequency for TIM3: 1 MHz -> 1 us per tick
 	timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	timerInitStructure.TIM_Period = 1000;								// 1000 us strobe length should suffice at 8 volts... maybe 1000 is necessary
+	timerInitStructure.TIM_Period = 750;								// 1000 us strobe length should suffice at 8 volts... maybe 1000 is necessary
 	timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	timerInitStructure.TIM_RepetitionCounter = 0;						// 1 cycle, then stop because in oe pulse mode
 	TIM_TimeBaseInit(TIM3, &timerInitStructure);
 
-	TIM_OCInitTypeDef outputChannelInit = {0,};
+	TIM_OCInitTypeDef outputChannelInit;
 	outputChannelInit.TIM_OCMode = TIM_OCMode_PWM1;						// set active high if counter > pulse
-	outputChannelInit.TIM_Pulse = 1;									// match at 1, so output will be low at timer reset but goes high immediately after start
+	outputChannelInit.TIM_Pulse = 1;									// match at 2, so output will be low at timer reset but goes high immediately after start
 	outputChannelInit.TIM_OutputState = TIM_OutputState_Enable;
 	outputChannelInit.TIM_OCPolarity = TIM_OCPolarity_High;
 	TIM_OC1Init(TIM3, &outputChannelInit);
@@ -213,7 +213,7 @@ void picture_dma_init() {
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 
 	DMA_InitTypeDef dmaInitStructure;
-	dmaInitStructure.DMA_BufferSize = image_test_length;								// 8 * 64 byte for text_picture
+	dmaInitStructure.DMA_BufferSize = image_test_length;								// 64 bytes per line
 	dmaInitStructure.DMA_DIR = DMA_DIR_PeripheralDST;					// peripheral (GPIO) is destination
 	dmaInitStructure.DMA_M2M = DMA_M2M_Disable;
 	dmaInitStructure.DMA_MemoryBaseAddr = (uint32_t)image_test;		// transfer image data
@@ -234,7 +234,7 @@ void picture_dma_init() {
 	nvicStructure.NVIC_IRQChannelSubPriority = 1;
 	nvicStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&nvicStructure);
-	DMA_ITConfig(DMA1_Channel2, DMA_IT_TE, ENABLE);
+	DMA_ITConfig(DMA1_Channel2, DMA_IT_TC, ENABLE);
 
 }
 
@@ -256,22 +256,24 @@ int main(void) {
 		// trigger TIM1 once, it should do 64 repetitions, triggering DMA1 each time -> one line of picture data should get transferred to printer
 		TIM_Cmd(TIM1, ENABLE);
 
-		// wait 0.5 ms for transfer to complete (64 transmission at 1 MHz should only take 64 us
+		// wait 0.5 ms for transfer to complete (64 transmission at 1 MHz should only take 64 us)
 		delay_usec(500);
 
 		// manually trigger latch for a few us -> data gets transferred from shift registers to strobes
-	    GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_RESET);
-	    delay_usec(100);
 	    GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_SET);
+	    delay_usec(100);
+	    GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_RESET);
 
 	    // manually trigger strobe
 	    TIM_Cmd(TIM3, ENABLE);
-	    delay_usec(1000);		// wait for strobe to finish
+	    //GPIO_WriteBit(GPIOB, GPIO_Pin_4, Bit_SET);
+	    delay_usec(750);		// wait for strobe to finish
+	    //GPIO_WriteBit(GPIOB, GPIO_Pin_4, Bit_RESET);
 
 	    // move forward a little bit
 	    GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_RESET);	// enable motor driver
 	    TIM_Cmd(TIM2, ENABLE);
-	    delay_msec(200);
+	    delay_msec(100);
 		TIM_Cmd(TIM2, DISABLE);
 	    GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_SET);		// disable motor driver
 
