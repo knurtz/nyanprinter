@@ -16,6 +16,7 @@
 
 #include "image_test.h"
 
+bool foo = true;
 
 // TIM2 update
 extern "C" void TIM2_IRQHandler()
@@ -23,7 +24,11 @@ extern "C" void TIM2_IRQHandler()
     if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET)
     {
         TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-        //switch between activating strobe (TIM3) or data transfer (TIM1)
+
+        // switch between:
+        if (foo) TIM_Cmd(TIM1, ENABLE);		// transferring image data
+        else TIM_Cmd(TIM3, ENABLE);			// and firing strobe
+        foo = !foo;
     }
 }
 
@@ -34,6 +39,19 @@ extern "C" void DMA1_Channel2_IRQHandler()
     {
     	DMA_ClearFlag(DMA1_FLAG_TC2);
         GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_RESET);		// turn on led
+    }
+}
+
+// TIM1 update
+extern "C" void TIM1_UP_IRQHandler()
+{
+    if (TIM_GetITStatus(TIM1, TIM_IT_Update) != RESET)
+    {
+        TIM_ClearITPendingBit(TIM1, TIM_IT_Update);
+
+        // trigger latch
+	    GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_SET);
+	    GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_RESET);
     }
 }
 
@@ -125,15 +143,15 @@ void parallel_clock_timer_init() {
 	TIM_CtrlPWMOutputs(TIM1, ENABLE);
 
 	NVIC_InitTypeDef nvicStructure;
-	nvicStructure.NVIC_IRQChannel = TIM1_CC_IRQn;
+	nvicStructure.NVIC_IRQChannel = TIM1_UP_IRQn;
 	nvicStructure.NVIC_IRQChannelPreemptionPriority = 0;
 	nvicStructure.NVIC_IRQChannelSubPriority = 1;
 	nvicStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&nvicStructure);
 
-	//TIM_ITConfig(TIM1, TIM_IT_Update, ENABLE);						// TIM1 update (high -> low) triggers printer to shift in data
+	TIM_ITConfig(TIM1, TIM_IT_Update, ENABLE);							// TIM1 update (high -> low) triggers printer to shift in data
 	//TIM_ITConfig(TIM1, TIM_IT_CC1, ENABLE);							// TIM1 compare match at 50% (low -> high) triggers DMA to put new data to D1 - D6 pins
-	TIM_DMACmd(TIM1, TIM_DMA_CC1, ENABLE);
+	TIM_DMACmd(TIM1, TIM_DMA_CC1, ENABLE);								// hook up TIM1 with DMA1 channel1
 
 	TIM_SelectOnePulseMode(TIM1, TIM_OPMode_Single);					// only fire once (each time with 64 repetitions)
 
@@ -169,7 +187,7 @@ void motor_timer_init() {
 	nvicStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&nvicStructure);
 
-	//TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);						// TIM2 update ISR triggers data transfer (TIM1) or strobe (TIM3)
+	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);							// TIM2 update ISR triggers data transfer (TIM1) or strobe (TIM3)
 
 	TIM_Cmd(TIM2, DISABLE);												// will be activated by code later
 }
@@ -244,33 +262,16 @@ int main(void) {
 	strobe_timer_init();
 
 
+    GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_RESET);	// enable motor driver
+    TIM_Cmd(TIM2, ENABLE);							// start motor
+
+
 	while(1) {
 
-		// start TIM1, it should do 64 repetitions, triggering DMA1 each time -> one line of image data should get transferred to printer
-		TIM_Cmd(TIM1, ENABLE);
 
-		// wait 0.5 ms for transfer to complete (64 transmission at 1 MHz should only take 64 us)
-		delay_usec(500);
+		delay_msec(3000);
+		GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_SET);
 
-		// manually trigger latch for a few us -> data gets transferred from shift registers to strobes
-	    GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_SET);
-	    delay_usec(100);
-	    GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_RESET);
-
-	    // trigger strobe
-	    TIM_Cmd(TIM3, ENABLE);
-	    delay_usec(1000);								// wait for strobe to finish
-
-	    // move forward a little bit
-	    GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_RESET);	// enable motor driver
-	    TIM_Cmd(TIM2, ENABLE);
-	    delay_msec(100);
-		TIM_Cmd(TIM2, DISABLE);
-	    GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_SET);		// disable motor driver
-
-	    GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_SET);		// disable onboard LED
-
-		delay_msec(500);
 
 	}
 
