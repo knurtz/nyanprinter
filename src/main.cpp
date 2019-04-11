@@ -16,37 +16,27 @@
 
 #include "image_test.h"
 
-// TIM2 update event: switch between activating strobe (TIM3) or data transfer (TIM1)
+
+// TIM2 update
 extern "C" void TIM2_IRQHandler()
 {
     if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET)
     {
         TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-        GPIO_WriteBit(GPIOC, GPIO_Pin_13, GPIO_ReadOutputDataBit(GPIOC, GPIO_Pin_13) ? Bit_RESET : Bit_SET);
+        //switch between activating strobe (TIM3) or data transfer (TIM1)
     }
 }
 
-// turn on LED on DMA transfer complete
+// DMA transfer complete
 extern "C" void DMA1_Channel2_IRQHandler()
 {
     if (DMA_GetFlagStatus(DMA1_FLAG_TC2) != RESET)
     {
     	DMA_ClearFlag(DMA1_FLAG_TC2);
-        GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_RESET);
+        GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_RESET);		// turn on led
     }
 }
 
-/*
-// TIM1 update event test function
-extern "C" void TIM1_CC_IRQHandler()
-{
-    if (TIM_GetITStatus(TIM1, TIM_IT_CC1) != RESET)
-    {
-        TIM_ClearITPendingBit(TIM1, TIM_IT_CC1);
-        GPIO_WriteBit(GPIOC, GPIO_Pin_13, GPIO_ReadOutputDataBit(GPIOC, GPIO_Pin_13) ? Bit_RESET : Bit_SET);
-    }
-}
-*/
 
 // manipulate image data on a pixel level
 // pixel to byte assignment is weird due to the way the printer gets its data (6 serial interfaces in parallel)
@@ -91,9 +81,11 @@ void gpio_init() {
 
     // init strobe pin PB4
 	gpio_init.GPIO_Pin = GPIO_Pin_4;
-	gpio_init.GPIO_Mode = GPIO_Mode_AF_PP;			// output, but controlled by TIM3
+	gpio_init.GPIO_Mode = GPIO_Mode_AF_PP;						// output, but controlled by TIM3
 	GPIO_Init(GPIOB, &gpio_init);
-	GPIO_WriteBit(GPIOB, GPIO_Pin_4, Bit_RESET); 	// strobe is active high
+	//GPIO_WriteBit(GPIOB, GPIO_Pin_4, Bit_RESET); 				// strobe is active high
+	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);	// disable JNTRST function of PB4 so it won't get pulled up
+	GPIO_PinRemapConfig(GPIO_PartialRemap_TIM3, ENABLE);		// remap TIM3 channel 1 to PB4 instead of PA6
 
 	//init parallel data pins PB8 - PB13 and motor direction pin PB14
 	gpio_init.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14;
@@ -190,13 +182,13 @@ void strobe_timer_init() {
 	TIM_TimeBaseInitTypeDef timerInitStructure;
 	timerInitStructure.TIM_Prescaler = (SystemCoreClock / 1000000) - 1;		// target frequency for TIM3: 1 MHz -> 1 us per tick
 	timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	timerInitStructure.TIM_Period = 750;								// 1000 us strobe length should suffice at 8 volts... maybe 1000 is necessary
+	timerInitStructure.TIM_Period = 1000;								// 750 us strobe length should suffice at 8 volts... maybe 1000 is necessary
 	timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	timerInitStructure.TIM_RepetitionCounter = 0;						// 1 cycle, then stop because in oe pulse mode
 	TIM_TimeBaseInit(TIM3, &timerInitStructure);
 
 	TIM_OCInitTypeDef outputChannelInit;
-	outputChannelInit.TIM_OCMode = TIM_OCMode_PWM1;						// set active high if counter > pulse
+	outputChannelInit.TIM_OCMode = TIM_OCMode_PWM2;						// set high if counter > pulse
 	outputChannelInit.TIM_Pulse = 1;									// match at 2, so output will be low at timer reset but goes high immediately after start
 	outputChannelInit.TIM_OutputState = TIM_OutputState_Enable;
 	outputChannelInit.TIM_OCPolarity = TIM_OCPolarity_High;
@@ -253,7 +245,8 @@ int main(void) {
 
 
 	while(1) {
-		// trigger TIM1 once, it should do 64 repetitions, triggering DMA1 each time -> one line of picture data should get transferred to printer
+
+		// start TIM1, it should do 64 repetitions, triggering DMA1 each time -> one line of image data should get transferred to printer
 		TIM_Cmd(TIM1, ENABLE);
 
 		// wait 0.5 ms for transfer to complete (64 transmission at 1 MHz should only take 64 us)
@@ -264,11 +257,9 @@ int main(void) {
 	    delay_usec(100);
 	    GPIO_WriteBit(GPIOA, GPIO_Pin_11, Bit_RESET);
 
-	    // manually trigger strobe
+	    // trigger strobe
 	    TIM_Cmd(TIM3, ENABLE);
-	    //GPIO_WriteBit(GPIOB, GPIO_Pin_4, Bit_SET);
-	    delay_usec(750);		// wait for strobe to finish
-	    //GPIO_WriteBit(GPIOB, GPIO_Pin_4, Bit_RESET);
+	    delay_usec(1000);								// wait for strobe to finish
 
 	    // move forward a little bit
 	    GPIO_WriteBit(GPIOA, GPIO_Pin_4, Bit_RESET);	// enable motor driver
@@ -279,7 +270,8 @@ int main(void) {
 
 	    GPIO_WriteBit(GPIOC, GPIO_Pin_13, Bit_SET);		// disable onboard LED
 
-		delay_sec(2);
+		delay_msec(500);
+
 	}
 
 	return 0;
