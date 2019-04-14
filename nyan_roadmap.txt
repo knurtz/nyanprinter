@@ -1,0 +1,96 @@
+Hardware configuration for NyanPrinter
+============================================
+
+GPIOA:
+- PA0: step signal - TIM2 channel 1 (alternate function)
+- PA1: button (ext. interrupt)
+- PA2: SPI chip select (output)
+- PA3: photoreflector (input)
+- PA4: motor enable (output)
+- PA5: GPIO / LED (output / input)
+- PA6: strobe signal - TIM3 channnel 1 (alternate function)
+- PA7: GPIO / LED (output / input)
+- PA8: clock signal - TIM1 channel 1 (alternate function)
+- PA9: USART1 - TX (alternate function)
+- PA10: USART1 - RX (alternate function)
+- PA11: manual latch (output)
+- PA12: USART1 - RTS (alternate function)
+- PA13: SWDIO (reset state)
+- PA14: SWCLK (reset state)
+- PA15: GPIO / LED (output / input)
+
+
+GPIOB:
+- PB0: thermistor print head - ADC1 input 8 (alternate function)
+- PB1: thermistor motor - ADC2 input 9 (alternate function)
+- PB2: BOOT1 (reset state)
+- PB3: led driver clock - SPI1 clock (alternate function)
+- PB4: led driver data - SPI1 MISO (alternate function)
+- PB5: led driver data - SPI1 MOSI (alternate function)
+- PB6: backup i2c - I2C1 SCL (alternate function)
+- PB7: backup i2c - I2C1 SDA (alternate function)
+- PB8 - PB13: printer data 1 - 6 (output)
+- PB14: motor direction (output)
+- PB15: automatic latch (output)
+
+SPI1:
+- transfers data to led driver (MAX6966)
+- data transmission gets triggered by DMA1 channel 3 (checks if SPI1 transmit buffer is empty)
+- DMA1 is only activated in main loop, whenever new led data is ready to be sent
+
+DMA1 Channel 2:
+- provides image data for printer on 6 parallel data lines
+- transmission is triggered by TIM1, which generates the serial clock for the printer
+- direction: memory -> peripheral
+- source: image buffer
+- destination: Port B ODR (output data register)
+- width: byte -> half word (only complete ODR can be written, so low byte of port b must all be on alternatve function or data is mirrored there as well)
+- data length: size of image buffer, 64 bytes per line
+- circular mode
+
+DMA1 Channel 3:
+- sends led data to SPI1
+- triggered by SPI1_TX (transmit buffer empty)
+- normally disabled, only activated in main loop when new led data is available (or maybe just continously)
+- direction: memory -> peripheral
+- source: led buffer
+- destination: SPI1 DR (data register)
+- width: half word -> half word
+- length: 9x 16 bit (9 transmissions)
+- non-circular mode
+
+TIM1:
+- generates clock for serial data transmission to printer -> TIM1_CH1 output to parallel clock pin
+- frequency: 72 MHz (system frequency)
+- period: 71 (generates 1 MHz clock)
+- channel 1 compare value: 35 (50 % duty cycle)
+- channel 1 maps to DMA1
+- one-pulse mode (64 repetitions, results in one image line)
+- after 64 repetitions: Interrupt that triggers latch (update interrupt)
+
+TIM2:
+- generiert Schrittimpulse für den Motor -> TIM2_CH1-Output an step-Pin
+- Frequenz: 10 kHz
+- Zählperiode: entsprechend für Frequenz der aktuellen Note
+- Channel 1 compare: 50 % der Zählperiode
+- PWM mode: 2 (Muster "high - low")
+- update interrupt: aktiviere TIM1 für Datenübertragung bzw. TIM3 für strobe-Impuls
+- Plan fürs Ende: läuft im slave mode, wird kontrolliert von TIM4
+
+TIM3:
+- generiert strobe-Impuls -> TIM3_CH1-Output an strobe-Pin
+- gestartet in ISR von TIM2 update
+- Frequenz: 1 MHz
+- Zählperiode: 750 (Bsp. für benötigten strobe-Impuls von rund 750 us)
+- Channel 1 compare: 1 (damit Ausgang nach Update low bleibt, aber sofort mit Start des Timers high geht)
+- PWM mode: 1 (Muster "low - high")
+- one-pulse mode
+
+TIM4:
+- generiert Aktivierungssignal für TIM2
+- kontrolliert damit die Tonlänge und gibt ein Interrupt, wenn der nächste Ton beginnen soll
+- Tonhöhe und Länge zunächst im main loop einstellen, dann TIM4 dafür nutzen
+
+USART1:
+- asynchronous mode
+- for debugging or daisy chaining multiple printers
