@@ -17231,9 +17231,9 @@ connection</text>
 <wire x1="48.26" y1="106.68" x2="35.56" y2="106.68" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="U3" gate="G$1" pin="P8"/>
-<wire x1="137.16" y1="55.88" x2="160.02" y2="55.88" width="0.1524" layer="91"/>
-<label x="144.78" y="55.88" size="1.778" layer="95"/>
+<pinref part="U3" gate="G$1" pin="P9"/>
+<wire x1="137.16" y1="53.34" x2="160.02" y2="53.34" width="0.1524" layer="91"/>
+<label x="144.78" y="53.34" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="LED3" class="0">
@@ -18223,14 +18223,14 @@ connection</text>
 </net>
 <net name="FREE_LED" class="0">
 <segment>
-<pinref part="U3" gate="G$1" pin="P9"/>
-<wire x1="137.16" y1="53.34" x2="160.02" y2="53.34" width="0.1524" layer="91"/>
-<label x="144.78" y="53.34" size="1.778" layer="95"/>
-</segment>
-<segment>
 <wire x1="35.56" y1="50.8" x2="48.26" y2="50.8" width="0.1524" layer="91"/>
 <label x="43.18" y="50.8" size="1.778" layer="95"/>
 <pinref part="X4" gate="G$1" pin="2"/>
+</segment>
+<segment>
+<pinref part="U3" gate="G$1" pin="P8"/>
+<wire x1="137.16" y1="55.88" x2="160.02" y2="55.88" width="0.1524" layer="91"/>
+<label x="144.78" y="55.88" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
