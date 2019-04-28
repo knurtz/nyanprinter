@@ -17998,7 +17998,7 @@ connection</text>
 <pinref part="JP2" gate="A" pin="1"/>
 </segment>
 </net>
-<net name="N$7" class="0">
+<net name="BOOT0" class="0">
 <segment>
 <pinref part="IC2" gate="RESET" pin="BOOT0"/>
 <wire x1="35.56" y1="-88.9" x2="43.18" y2="-88.9" width="0.1524" layer="91"/>
@@ -18007,6 +18007,7 @@ connection</text>
 <wire x1="43.18" y1="-91.44" x2="43.18" y2="-88.9" width="0.1524" layer="91"/>
 <junction x="43.18" y="-88.9"/>
 <pinref part="JP1" gate="A" pin="1"/>
+<label x="43.18" y="-88.9" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$8" class="0">
