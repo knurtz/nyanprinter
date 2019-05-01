@@ -16520,7 +16520,6 @@ Source: www.kingbright.com</description>
 <part name="X5" library="con-lstb" deviceset="MA03-1" device="ROUND_PAD"/>
 <part name="GND9" library="supply1" deviceset="GND" device=""/>
 <part name="R1" library="rcl" deviceset="R-EU_" device="R0603" value="300"/>
-<part name="P+8" library="supply1" deviceset="+5V" device=""/>
 <part name="P+9" library="supply1" deviceset="+5V" device=""/>
 <part name="P+10" library="supply1" deviceset="+12V" device=""/>
 <part name="R2" library="rcl" deviceset="R-EU_" device="R0603" value="47k"/>
@@ -16602,6 +16601,8 @@ Source: www.kingbright.com</description>
 <part name="X3" library="TURAG_Steckverbinder" deviceset="WR-WTB2.0-5" device="_THT-VER"/>
 <part name="JP1" library="jumper" deviceset="JP1E" device=""/>
 <part name="JP2" library="jumper" deviceset="JP1E" device=""/>
+<part name="+3V12" library="supply1" deviceset="+3V3" device=""/>
+<part name="+3V13" library="supply1" deviceset="+3V3" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -16711,7 +16712,6 @@ connection</text>
 <instance part="X5" gate="G$1" x="12.7" y="20.32"/>
 <instance part="GND9" gate="1" x="25.4" y="12.7"/>
 <instance part="R1" gate="G$1" x="238.76" y="55.88" rot="R90"/>
-<instance part="P+8" gate="1" x="248.92" y="71.12"/>
 <instance part="P+9" gate="1" x="228.6" y="116.84"/>
 <instance part="P+10" gate="1" x="228.6" y="144.78"/>
 <instance part="R2" gate="G$1" x="248.92" y="55.88" rot="R90"/>
@@ -16746,7 +16746,7 @@ connection</text>
 <instance part="GND6" gate="1" x="228.6" y="152.4"/>
 <instance part="+3V4" gate="G$1" x="228.6" y="177.8"/>
 <instance part="R3" gate="G$1" x="228.6" y="167.64" rot="R90"/>
-<instance part="R4" gate="G$1" x="220.98" y="104.14"/>
+<instance part="R4" gate="G$1" x="213.36" y="119.38" rot="R90"/>
 <instance part="+3V5" gate="G$1" x="78.74" y="38.1" rot="MR0"/>
 <instance part="GND13" gate="1" x="78.74" y="7.62" rot="MR0"/>
 <instance part="C7" gate="G$1" x="78.74" y="22.86" rot="MR180"/>
@@ -16805,6 +16805,8 @@ connection</text>
 <instance part="X3" gate="G$1" x="33.02" y="73.66" rot="R180"/>
 <instance part="JP1" gate="A" x="33.02" y="-88.9" rot="R90"/>
 <instance part="JP2" gate="A" x="22.86" y="-88.9" rot="MR90"/>
+<instance part="+3V12" gate="G$1" x="248.92" y="71.12" rot="MR0"/>
+<instance part="+3V13" gate="G$1" x="213.36" y="132.08"/>
 </instances>
 <busses>
 </busses>
@@ -16843,24 +16845,11 @@ connection</text>
 <pinref part="P+7" gate="1" pin="+5V"/>
 </segment>
 <segment>
-<pinref part="P+8" gate="1" pin="+5V"/>
-<pinref part="R1" gate="G$1" pin="2"/>
-<wire x1="248.92" y1="68.58" x2="248.92" y2="63.5" width="0.1524" layer="91"/>
-<pinref part="R2" gate="G$1" pin="2"/>
-<wire x1="248.92" y1="63.5" x2="238.76" y2="63.5" width="0.1524" layer="91"/>
-<wire x1="238.76" y1="63.5" x2="238.76" y2="60.96" width="0.1524" layer="91"/>
-<wire x1="248.92" y1="63.5" x2="248.92" y2="60.96" width="0.1524" layer="91"/>
-<junction x="248.92" y="63.5"/>
-</segment>
-<segment>
 <pinref part="X7" gate="G$1" pin="14"/>
 <wire x1="251.46" y1="104.14" x2="228.6" y2="104.14" width="0.1524" layer="91"/>
 <label x="233.68" y="104.14" size="1.778" layer="95"/>
 <pinref part="P+9" gate="1" pin="+5V"/>
 <wire x1="228.6" y1="104.14" x2="228.6" y2="114.3" width="0.1524" layer="91"/>
-<pinref part="R4" gate="G$1" pin="2"/>
-<wire x1="226.06" y1="104.14" x2="228.6" y2="104.14" width="0.1524" layer="91"/>
-<junction x="228.6" y="104.14"/>
 </segment>
 <segment>
 <pinref part="IC1" gate="P" pin="VCC"/>
@@ -17467,6 +17456,21 @@ connection</text>
 <wire x1="27.94" y1="-76.2" x2="27.94" y2="-78.74" width="0.1524" layer="91"/>
 <junction x="27.94" y="-78.74"/>
 </segment>
+<segment>
+<pinref part="R1" gate="G$1" pin="2"/>
+<wire x1="248.92" y1="68.58" x2="248.92" y2="63.5" width="0.1524" layer="91"/>
+<pinref part="R2" gate="G$1" pin="2"/>
+<wire x1="248.92" y1="63.5" x2="238.76" y2="63.5" width="0.1524" layer="91"/>
+<wire x1="238.76" y1="63.5" x2="238.76" y2="60.96" width="0.1524" layer="91"/>
+<wire x1="248.92" y1="63.5" x2="248.92" y2="60.96" width="0.1524" layer="91"/>
+<junction x="248.92" y="63.5"/>
+<pinref part="+3V12" gate="G$1" pin="+3V3"/>
+</segment>
+<segment>
+<pinref part="R4" gate="G$1" pin="2"/>
+<pinref part="+3V13" gate="G$1" pin="+3V3"/>
+<wire x1="213.36" y1="129.54" x2="213.36" y2="124.46" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="M2B" class="0">
 <segment>
@@ -17899,9 +17903,8 @@ connection</text>
 <segment>
 <pinref part="X7" gate="G$1" pin="12"/>
 <wire x1="251.46" y1="109.22" x2="213.36" y2="109.22" width="0.1524" layer="91"/>
-<wire x1="213.36" y1="109.22" x2="213.36" y2="104.14" width="0.1524" layer="91"/>
 <pinref part="R4" gate="G$1" pin="1"/>
-<wire x1="213.36" y1="104.14" x2="215.9" y2="104.14" width="0.1524" layer="91"/>
+<wire x1="213.36" y1="109.22" x2="213.36" y2="114.3" width="0.1524" layer="91"/>
 <wire x1="213.36" y1="109.22" x2="205.74" y2="109.22" width="0.1524" layer="91"/>
 <junction x="213.36" y="109.22"/>
 <label x="205.74" y="109.22" size="1.778" layer="95"/>
