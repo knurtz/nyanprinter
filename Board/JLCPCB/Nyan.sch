@@ -558,92 +558,6 @@ Copyright: Würth Elektronik</description>
 </deviceset>
 </devicesets>
 </library>
-<library name="robotics">
-<packages>
-<package name="A4988_STEP">
-<wire x1="7.62" y1="10.16" x2="-7.62" y2="10.16" width="0.127" layer="21"/>
-<wire x1="-7.62" y1="10.16" x2="-7.62" y2="-10.16" width="0.127" layer="21"/>
-<wire x1="-7.62" y1="-10.16" x2="7.62" y2="-10.16" width="0.127" layer="21"/>
-<wire x1="7.62" y1="-10.16" x2="7.62" y2="10.16" width="0.127" layer="21"/>
-<pad name="MS1" x="-6.35" y="6.35" drill="0.8" diameter="1.905"/>
-<pad name="MS2" x="-6.35" y="3.81" drill="0.8" diameter="1.905"/>
-<pad name="MS3" x="-6.35" y="1.27" drill="0.8" diameter="1.905"/>
-<pad name="/RST" x="-6.35" y="-1.27" drill="0.8" diameter="1.905"/>
-<pad name="/SLP" x="-6.35" y="-3.81" drill="0.8" diameter="1.905"/>
-<pad name="STEP" x="-6.35" y="-6.35" drill="0.8" diameter="1.905"/>
-<pad name="DIR" x="-6.35" y="-8.89" drill="0.8" diameter="1.905"/>
-<pad name="/EN" x="-6.35" y="8.89" drill="0.8" diameter="1.905"/>
-<pad name="GND" x="6.35" y="6.35" drill="0.8" diameter="1.905"/>
-<pad name="2B" x="6.35" y="3.81" drill="0.8" diameter="1.905"/>
-<pad name="2A" x="6.35" y="1.27" drill="0.8" diameter="1.905"/>
-<pad name="1A" x="6.35" y="-1.27" drill="0.8" diameter="1.905"/>
-<pad name="1B" x="6.35" y="-3.81" drill="0.8" diameter="1.905"/>
-<pad name="VDD" x="6.35" y="-6.35" drill="0.8" diameter="1.905"/>
-<pad name="GND2" x="6.35" y="-8.89" drill="0.8" diameter="1.905"/>
-<pad name="VMOT" x="6.35" y="8.89" drill="0.8" diameter="1.905"/>
-<text x="0" y="-10.16" size="1.27" layer="21" align="center">A4988
-Stepper Motor Driver</text>
-<text x="0" y="11.43" size="1.27" layer="21" align="center">&gt;NAME</text>
-</package>
-</packages>
-<symbols>
-<symbol name="A4988_STEP">
-<wire x1="-7.62" y1="11.43" x2="7.62" y2="11.43" width="0.254" layer="94"/>
-<wire x1="7.62" y1="11.43" x2="7.62" y2="-8.89" width="0.254" layer="94"/>
-<wire x1="7.62" y1="-8.89" x2="-7.62" y2="-8.89" width="0.254" layer="94"/>
-<wire x1="-7.62" y1="-8.89" x2="-7.62" y2="11.43" width="0.254" layer="94"/>
-<pin name="/EN" x="-10.16" y="10.16" visible="pin" length="short"/>
-<pin name="MS1" x="-10.16" y="7.62" visible="pin" length="short"/>
-<pin name="MS2" x="-10.16" y="5.08" visible="pin" length="short"/>
-<pin name="MS3" x="-10.16" y="2.54" visible="pin" length="short"/>
-<pin name="/RST" x="-10.16" y="0" visible="pin" length="short"/>
-<pin name="/SLP" x="-10.16" y="-2.54" visible="pin" length="short"/>
-<pin name="STEP" x="-10.16" y="-5.08" visible="pin" length="short"/>
-<pin name="DIR" x="-10.16" y="-7.62" visible="pin" length="short"/>
-<pin name="VMOT" x="10.16" y="10.16" visible="pin" length="short" rot="R180"/>
-<pin name="GND" x="10.16" y="7.62" visible="pin" length="short" rot="R180"/>
-<pin name="2B" x="10.16" y="5.08" visible="pin" length="short" rot="R180"/>
-<pin name="2A" x="10.16" y="2.54" visible="pin" length="short" rot="R180"/>
-<pin name="1A" x="10.16" y="0" visible="pin" length="short" rot="R180"/>
-<pin name="1B" x="10.16" y="-2.54" visible="pin" length="short" rot="R180"/>
-<pin name="VDD" x="10.16" y="-5.08" visible="pin" length="short" rot="R180"/>
-<text x="0" y="12.7" size="1.778" layer="94" align="center">&gt;NAME</text>
-<text x="0" y="-10.16" size="1.778" layer="94" align="center">Stepper Motor Driver</text>
-<text x="3.81" y="-7.62" size="1.778" layer="94" align="center">A4988</text>
-</symbol>
-</symbols>
-<devicesets>
-<deviceset name="A4988_STEP">
-<gates>
-<gate name="G$1" symbol="A4988_STEP" x="0" y="0"/>
-</gates>
-<devices>
-<device name="" package="A4988_STEP">
-<connects>
-<connect gate="G$1" pin="/EN" pad="/EN"/>
-<connect gate="G$1" pin="/RST" pad="/RST"/>
-<connect gate="G$1" pin="/SLP" pad="/SLP"/>
-<connect gate="G$1" pin="1A" pad="1A"/>
-<connect gate="G$1" pin="1B" pad="1B"/>
-<connect gate="G$1" pin="2A" pad="2A"/>
-<connect gate="G$1" pin="2B" pad="2B"/>
-<connect gate="G$1" pin="DIR" pad="DIR"/>
-<connect gate="G$1" pin="GND" pad="GND GND2"/>
-<connect gate="G$1" pin="MS1" pad="MS1"/>
-<connect gate="G$1" pin="MS2" pad="MS2"/>
-<connect gate="G$1" pin="MS3" pad="MS3"/>
-<connect gate="G$1" pin="STEP" pad="STEP"/>
-<connect gate="G$1" pin="VDD" pad="VDD"/>
-<connect gate="G$1" pin="VMOT" pad="VMOT"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
-</devicesets>
-</library>
 <library name="meineLibrary">
 <packages>
 <package name="QSOP-16">
@@ -16481,6 +16395,91 @@ Source: www.kingbright.com</description>
 </deviceset>
 </devicesets>
 </library>
+<library name="IC">
+<packages>
+<package name="A4988_STEP">
+<wire x1="7.62" y1="10.16" x2="-7.62" y2="10.16" width="0.127" layer="21"/>
+<wire x1="-7.62" y1="10.16" x2="-7.62" y2="-10.16" width="0.127" layer="21"/>
+<wire x1="-7.62" y1="-10.16" x2="7.62" y2="-10.16" width="0.127" layer="21"/>
+<wire x1="7.62" y1="-10.16" x2="7.62" y2="10.16" width="0.127" layer="21"/>
+<pad name="MS1" x="-6.35" y="6.35" drill="0.8" diameter="1.905"/>
+<pad name="MS2" x="-6.35" y="3.81" drill="0.8" diameter="1.905"/>
+<pad name="MS3" x="-6.35" y="1.27" drill="0.8" diameter="1.905"/>
+<pad name="/RST" x="-6.35" y="-1.27" drill="0.8" diameter="1.905"/>
+<pad name="/SLP" x="-6.35" y="-3.81" drill="0.8" diameter="1.905"/>
+<pad name="STEP" x="-6.35" y="-6.35" drill="0.8" diameter="1.905"/>
+<pad name="DIR" x="-6.35" y="-8.89" drill="0.8" diameter="1.905"/>
+<pad name="/EN" x="-6.35" y="8.89" drill="0.8" diameter="1.905"/>
+<pad name="GND" x="6.35" y="6.35" drill="0.8" diameter="1.905"/>
+<pad name="2B" x="6.35" y="3.81" drill="0.8" diameter="1.905"/>
+<pad name="2A" x="6.35" y="1.27" drill="0.8" diameter="1.905"/>
+<pad name="1A" x="6.35" y="-1.27" drill="0.8" diameter="1.905"/>
+<pad name="1B" x="6.35" y="-3.81" drill="0.8" diameter="1.905"/>
+<pad name="VDD" x="6.35" y="-6.35" drill="0.8" diameter="1.905"/>
+<pad name="GND2" x="6.35" y="-8.89" drill="0.8" diameter="1.905"/>
+<pad name="VMOT" x="6.35" y="8.89" drill="0.8" diameter="1.905"/>
+<text x="0" y="-9.76" size="1.27" layer="21" align="bottom-center">A4988</text>
+<text x="0" y="11.43" size="1.27" layer="21" align="center">&gt;NAME</text>
+</package>
+</packages>
+<symbols>
+<symbol name="A4988_STEP">
+<wire x1="-7.62" y1="11.43" x2="7.62" y2="11.43" width="0.254" layer="94"/>
+<wire x1="7.62" y1="11.43" x2="7.62" y2="-8.89" width="0.254" layer="94"/>
+<wire x1="7.62" y1="-8.89" x2="-7.62" y2="-8.89" width="0.254" layer="94"/>
+<wire x1="-7.62" y1="-8.89" x2="-7.62" y2="11.43" width="0.254" layer="94"/>
+<pin name="/EN" x="-10.16" y="10.16" visible="pin" length="short"/>
+<pin name="MS1" x="-10.16" y="7.62" visible="pin" length="short"/>
+<pin name="MS2" x="-10.16" y="5.08" visible="pin" length="short"/>
+<pin name="MS3" x="-10.16" y="2.54" visible="pin" length="short"/>
+<pin name="/RST" x="-10.16" y="0" visible="pin" length="short"/>
+<pin name="/SLP" x="-10.16" y="-2.54" visible="pin" length="short"/>
+<pin name="STEP" x="-10.16" y="-5.08" visible="pin" length="short"/>
+<pin name="DIR" x="-10.16" y="-7.62" visible="pin" length="short"/>
+<pin name="VMOT" x="10.16" y="10.16" visible="pin" length="short" rot="R180"/>
+<pin name="GND" x="10.16" y="7.62" visible="pin" length="short" rot="R180"/>
+<pin name="2B" x="10.16" y="5.08" visible="pin" length="short" rot="R180"/>
+<pin name="2A" x="10.16" y="2.54" visible="pin" length="short" rot="R180"/>
+<pin name="1A" x="10.16" y="0" visible="pin" length="short" rot="R180"/>
+<pin name="1B" x="10.16" y="-2.54" visible="pin" length="short" rot="R180"/>
+<pin name="VDD" x="10.16" y="-5.08" visible="pin" length="short" rot="R180"/>
+<text x="0" y="12.7" size="1.778" layer="94" align="center">&gt;NAME</text>
+<text x="0" y="-10.16" size="1.778" layer="94" align="center">Stepper Motor Driver</text>
+<text x="3.81" y="-7.62" size="1.778" layer="94" align="center">A4988</text>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="A4988_STEP">
+<gates>
+<gate name="G$1" symbol="A4988_STEP" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="A4988_STEP">
+<connects>
+<connect gate="G$1" pin="/EN" pad="/EN"/>
+<connect gate="G$1" pin="/RST" pad="/RST"/>
+<connect gate="G$1" pin="/SLP" pad="/SLP"/>
+<connect gate="G$1" pin="1A" pad="1A"/>
+<connect gate="G$1" pin="1B" pad="1B"/>
+<connect gate="G$1" pin="2A" pad="2A"/>
+<connect gate="G$1" pin="2B" pad="2B"/>
+<connect gate="G$1" pin="DIR" pad="DIR"/>
+<connect gate="G$1" pin="GND" pad="GND GND2"/>
+<connect gate="G$1" pin="MS1" pad="MS1"/>
+<connect gate="G$1" pin="MS2" pad="MS2"/>
+<connect gate="G$1" pin="MS3" pad="MS3"/>
+<connect gate="G$1" pin="STEP" pad="STEP"/>
+<connect gate="G$1" pin="VDD" pad="VDD"/>
+<connect gate="G$1" pin="VMOT" pad="VMOT"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -16495,7 +16494,7 @@ Source: www.kingbright.com</description>
 <part name="X8" library="Wuerth_Elektronik_eiCan_03_ZIF_Connectors_Flat_Flexible_Cable" deviceset="68610414122" device=""/>
 <part name="X6" library="Wuerth_Elektronik_eiCan_03_ZIF_Connectors_Flat_Flexible_Cable" deviceset="68610614122" device=""/>
 <part name="X7" library="Wuerth_Elektronik_eiCan_03_ZIF_Connectors_Flat_Flexible_Cable" deviceset="68612414422" device=""/>
-<part name="U3" library="robotics" deviceset="A4988_STEP" device=""/>
+<part name="U3" library="IC" deviceset="A4988_STEP" device=""/>
 <part name="U4" library="meineLibrary" deviceset="MAX6966" device=""/>
 <part name="P+1" library="supply1" deviceset="+5V" device=""/>
 <part name="GND1" library="supply1" deviceset="GND" device=""/>
@@ -16611,9 +16610,9 @@ Source: www.kingbright.com</description>
 <text x="2.54" y="127" size="1.778" layer="97" rot="R90">PWR input</text>
 <text x="2.54" y="60.96" size="1.778" layer="97" rot="R90">LEDs</text>
 <text x="2.54" y="12.7" size="1.778" layer="97" rot="R90">RS485 / UART</text>
-<text x="165.1" y="-157.48" size="1.778" layer="97">* Latch hängt an zwei GPIO, damit das Signal
-wahlweise über DMA (PB15) oder manuell  (PA11)
-gesetzt werden kann.</text>
+<text x="165.1" y="-157.48" size="1.778" layer="97">* Latch is attached to two GPIOs, 
+so that the signal can either be set 
+by DMA (PB15) or manually  (PA11).</text>
 <text x="165.1" y="25.4" size="1.778" layer="97">* Pinbelegung im Vergleich zum Datenblatt gedreht,
 da Kontakte auf Platinenunterseite liegen.</text>
 <wire x1="0" y1="40.64" x2="66.04" y2="40.64" width="0.1524" layer="97" style="longdash"/>
