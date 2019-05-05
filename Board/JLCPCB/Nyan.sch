@@ -16728,8 +16728,8 @@ connection</text>
 <instance part="U8" gate="PORTB_L" x="203.2" y="-88.9" rot="MR0"/>
 <instance part="U8" gate="PORTB_H" x="203.2" y="-111.76" rot="MR0"/>
 <instance part="U8" gate="POWER" x="99.06" y="-35.56"/>
-<instance part="U8" gate="PORTC" x="139.7" y="-116.84" rot="MR180"/>
-<instance part="U8" gate="PORTD/OSC" x="139.7" y="-149.86" rot="R180"/>
+<instance part="U8" gate="PORTC" x="142.24" y="-149.86" rot="MR180"/>
+<instance part="U8" gate="PORTD/OSC" x="142.24" y="-116.84" rot="R180"/>
 <instance part="U8" gate="AN_POWER" x="10.16" y="-35.56"/>
 <instance part="U8" gate="RESET" x="71.12" y="-91.44" rot="R180"/>
 <instance part="FRAME2" gate="G$1" x="0" y="-182.88"/>
@@ -18037,12 +18037,12 @@ connection</text>
 <pinref part="Q2" gate="G$1" pin="1"/>
 <wire x1="109.22" y1="-142.24" x2="109.22" y2="-139.7" width="0.1524" layer="91"/>
 <wire x1="109.22" y1="-139.7" x2="127" y2="-139.7" width="0.1524" layer="91"/>
-<pinref part="U8" gate="PORTD/OSC" pin="PD1/OSC=&gt;"/>
 <wire x1="127" y1="-139.7" x2="127" y2="-147.32" width="0.1524" layer="91"/>
-<wire x1="127" y1="-147.32" x2="132.08" y2="-147.32" width="0.1524" layer="91"/>
 <pinref part="C12" gate="G$1" pin="1"/>
 <wire x1="104.14" y1="-139.7" x2="109.22" y2="-139.7" width="0.1524" layer="91"/>
 <junction x="109.22" y="-139.7"/>
+<pinref part="U8" gate="PORTC" pin="PC15-OSC32_OUT"/>
+<wire x1="127" y1="-147.32" x2="134.62" y2="-147.32" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$10" class="0">
@@ -18050,12 +18050,12 @@ connection</text>
 <pinref part="Q2" gate="G$1" pin="2"/>
 <wire x1="109.22" y1="-157.48" x2="109.22" y2="-160.02" width="0.1524" layer="91"/>
 <wire x1="109.22" y1="-160.02" x2="127" y2="-160.02" width="0.1524" layer="91"/>
-<pinref part="U8" gate="PORTD/OSC" pin="PD0/OSC&lt;="/>
 <wire x1="127" y1="-160.02" x2="127" y2="-149.86" width="0.1524" layer="91"/>
-<wire x1="127" y1="-149.86" x2="132.08" y2="-149.86" width="0.1524" layer="91"/>
 <pinref part="C11" gate="G$1" pin="1"/>
 <wire x1="104.14" y1="-160.02" x2="109.22" y2="-160.02" width="0.1524" layer="91"/>
 <junction x="109.22" y="-160.02"/>
+<pinref part="U8" gate="PORTC" pin="PC14-OSC32_IN"/>
+<wire x1="134.62" y1="-149.86" x2="127" y2="-149.86" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$11" class="0">
@@ -18064,11 +18064,11 @@ connection</text>
 <wire x1="109.22" y1="-124.46" x2="109.22" y2="-127" width="0.1524" layer="91"/>
 <wire x1="109.22" y1="-127" x2="127" y2="-127" width="0.1524" layer="91"/>
 <wire x1="127" y1="-127" x2="127" y2="-116.84" width="0.1524" layer="91"/>
-<pinref part="U8" gate="PORTC" pin="PC14-OSC32_IN"/>
-<wire x1="127" y1="-116.84" x2="132.08" y2="-116.84" width="0.1524" layer="91"/>
 <pinref part="C10" gate="G$1" pin="1"/>
 <wire x1="104.14" y1="-127" x2="109.22" y2="-127" width="0.1524" layer="91"/>
 <junction x="109.22" y="-127"/>
+<pinref part="U8" gate="PORTD/OSC" pin="PD0/OSC&lt;="/>
+<wire x1="127" y1="-116.84" x2="134.62" y2="-116.84" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$14" class="0">
@@ -18077,11 +18077,11 @@ connection</text>
 <wire x1="109.22" y1="-109.22" x2="109.22" y2="-106.68" width="0.1524" layer="91"/>
 <wire x1="109.22" y1="-106.68" x2="127" y2="-106.68" width="0.1524" layer="91"/>
 <wire x1="127" y1="-106.68" x2="127" y2="-114.3" width="0.1524" layer="91"/>
-<pinref part="U8" gate="PORTC" pin="PC15-OSC32_OUT"/>
-<wire x1="127" y1="-114.3" x2="132.08" y2="-114.3" width="0.1524" layer="91"/>
 <pinref part="C9" gate="G$1" pin="1"/>
 <wire x1="104.14" y1="-106.68" x2="109.22" y2="-106.68" width="0.1524" layer="91"/>
 <junction x="109.22" y="-106.68"/>
+<pinref part="U8" gate="PORTD/OSC" pin="PD1/OSC=&gt;"/>
+<wire x1="127" y1="-114.3" x2="134.62" y2="-114.3" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$16" class="0">
@@ -18116,10 +18116,10 @@ connection</text>
 </segment>
 <segment>
 <pinref part="U8" gate="PORTC" pin="PC13-TAMPER-RTC"/>
-<wire x1="132.08" y1="-119.38" x2="129.54" y2="-119.38" width="0.1524" layer="91"/>
-<wire x1="129.54" y1="-119.38" x2="129.54" y2="-127" width="0.1524" layer="91"/>
-<wire x1="129.54" y1="-127" x2="147.32" y2="-127" width="0.1524" layer="91"/>
-<label x="139.7" y="-127" size="1.778" layer="95"/>
+<wire x1="134.62" y1="-152.4" x2="132.08" y2="-152.4" width="0.1524" layer="91"/>
+<wire x1="132.08" y1="-152.4" x2="132.08" y2="-160.02" width="0.1524" layer="91"/>
+<wire x1="132.08" y1="-160.02" x2="149.86" y2="-160.02" width="0.1524" layer="91"/>
+<label x="142.24" y="-160.02" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="PA15" class="0">
