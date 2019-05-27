@@ -46,6 +46,7 @@ void gpio_init() {
 	GPIO_Init(LED4_PORT, &gpio_init);
 	GPIO_WriteBit(LED4_PORT, LED4_PIN, LED_RESET_STATE);
 
+
 	// init motor pins
 	gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;			// normal output
 	gpio_init.GPIO_Pin = MOTOR_EN_PIN;

@@ -26,17 +26,16 @@ int main(void) {
 	SystemInit();
 
 	// initialize some stuff
-	delay_init(DELAY_RESOLUTION_10_US);				// init delay with granularity of 10 us
+	delay_init(DELAY_RESOLUTION_10_US);
 	gpio_init();
-
 	printer_clk_init();
 	motor_step_init();
 	printer_strobe_init();
-
 	image_dma_init(image_test, image_test_length);
 
-    GPIO_WriteBit(MOTOR_EN_PORT, MOTOR_EN_PIN, MOTOR_EN_SET_STATE);	// enable motor driver
-    TIM_Cmd(TIM2, ENABLE);							// start motor
+	// enable motor
+    GPIO_WriteBit(MOTOR_EN_PORT, MOTOR_EN_PIN, MOTOR_EN_SET_STATE);
+    TIM_Cmd(TIM2, ENABLE);
 
 	while(1) {
 
