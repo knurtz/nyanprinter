@@ -9,7 +9,7 @@ motor_dir = 1       # forward direction depends on wiring of the motor and can e
 image = Image.open("Source/test_image.png")
 
 if not image.width == 384:
-	print "Wrong image width, must be 192 px!"
+	print "Wrong image width, must be 384 px!"
 	exit()
 
 pixels = image.load()
@@ -35,10 +35,19 @@ current_pixel = 1
 # bit 1 stands for the second 64 pixels and so on
 for l in range(0, image.height):
 
-	print "Analyzing line " + str(l)
+	#print "Analyzing line " + str(l)
+
+	# test line for more than 64 black pixels
+	black_pixels = 0
+	for x in range(0, 384):
+		if pixels[x, l]:
+			black_pixels = black_pixels + 1
+	if black_pixels > 64:
+		print "More than 64 pixels in this line are black."
+        
 	
 	for byte_number in range(0, 64):
-
+	
 		new_byte = base_byte        # copy what's always the same
 
 		for bit_number in range(0, 6):
