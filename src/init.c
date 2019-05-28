@@ -123,14 +123,14 @@ void motor_step_init() {
 	TIM_TimeBaseInitTypeDef timerInitStructure;
 	timerInitStructure.TIM_Prescaler = 71;								// frequency for TIM2: 1 MHz
 	timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	timerInitStructure.TIM_Period = 2000;								// for 500 Hz step frequency. motor speed can be updated with a separate function to create required pitch
+	timerInitStructure.TIM_Period = 3000;								// for 333 Hz step frequency. motor speed can be updated with a separate function to create required pitch
 	timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	timerInitStructure.TIM_RepetitionCounter = 0;
 	TIM_TimeBaseInit(TIM2, &timerInitStructure);
 
 	TIM_OCInitTypeDef outputChannelInit;
 	outputChannelInit.TIM_OCMode = TIM_OCMode_PWM2;						// set output high if counter > pulse --> pattern "low - high"
-	outputChannelInit.TIM_Pulse = 1000;									// 50 % doodie cycle - also updated according to pitch
+	outputChannelInit.TIM_Pulse = 1500;									// 50 % doodie cycle - also updated according to pitch
 	outputChannelInit.TIM_OutputState = TIM_OutputState_Enable;
 	outputChannelInit.TIM_OCPolarity = TIM_OCPolarity_High;
 	TIM_OC1Init(TIM2, &outputChannelInit);

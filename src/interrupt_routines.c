@@ -10,11 +10,11 @@
 
 #include "pins.h"
 
-bool foo = true;
+uint8_t foo = 0;
 
 
 // TIM1 update (printer clk timer)
-extern "C" void TIM1_UP_IRQHandler() {
+void TIM1_UP_IRQHandler() {
 	// this triggers whenever the printer has received a full new line of image data (64 transfers)
     if (TIM_GetITStatus(TIM1, TIM_IT_Update) != RESET) {
         TIM_ClearITPendingBit(TIM1, TIM_IT_Update);
@@ -27,7 +27,7 @@ extern "C" void TIM1_UP_IRQHandler() {
 
 
 // TIM2 update (motor step timer)
-extern "C" void TIM2_IRQHandler() {
+void TIM2_IRQHandler() {
 	// this triggers whenever the motor gets a new step impulse
     if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
         TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
@@ -41,7 +41,7 @@ extern "C" void TIM2_IRQHandler() {
 
 
 // DMA1 channel2
-extern "C" void DMA1_Channel2_IRQHandler() {
+void DMA1_Channel2_IRQHandler() {
 	// this triggers whenever the image buffer has been transferred completely (all lines)
     if (DMA_GetFlagStatus(DMA1_FLAG_TC2) != RESET) {
     	DMA_ClearFlag(DMA1_FLAG_TC2);
