@@ -15,6 +15,8 @@
 void led_blink();
 void led_half_blink();
 
+void set_motor_freq(uint16_t hz);
+
 #ifdef __cplusplus
 }
 #endif
