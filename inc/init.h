@@ -12,7 +12,7 @@
 #include "stm32f10x_conf.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 void gpio_init();

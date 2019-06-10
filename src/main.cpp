@@ -17,6 +17,7 @@
 #include "init.h"
 #include "helper.h"
 #include "pins.h"
+#include "notes.h"
 
 #include "image_test.h"
 
@@ -34,35 +35,35 @@ int main(void) {
 	image_dma_init(image_test, image_test_length);
 
 	// enable motor
-    GPIO_WriteBit(MOTOR_EN_PORT, MOTOR_EN_PIN, MOTOR_EN_SET_STATE);
+	GPIO_WriteBit(MOTOR_EN_PORT, MOTOR_EN_PIN, MOTOR_EN_SET_STATE);
 
 	while(1) {
 
 		delay_msec(1000);
 
-	    TIM_Cmd(TIM2, ENABLE);
+		TIM_Cmd(TIM2, ENABLE);
 
-	    set_motor_freq(220);			// A
+		set_motor_freq(NOTE_A << 1);			// A
 		delay_msec(300);
 		set_motor_freq(247);			// B
 		delay_msec(300);
 		set_motor_freq(277);			// C#
-	    delay_msec(300);
+		delay_msec(300);
 		set_motor_freq(294);			// D
 		delay_msec(300);
 		set_motor_freq(330);			// E
-	    delay_msec(300);
-	    set_motor_freq(370);			// F#
-	    delay_msec(300);
-	    set_motor_freq(415);			// G#
-	    delay_msec(300);
-	    set_motor_freq(440);			// A
-	    delay_msec(300);
-	    set_motor_freq(494);			// B
-	    delay_msec(300);
-	    set_motor_freq(554);			// C#
-	    delay_msec(300);
-	    set_motor_freq(587);			// D
+		delay_msec(300);
+		set_motor_freq(370);			// F#
+		delay_msec(300);
+		set_motor_freq(415);			// G#
+		delay_msec(300);
+		set_motor_freq(440);			// A
+		delay_msec(300);
+		set_motor_freq(494);			// B
+		delay_msec(300);
+		set_motor_freq(554);			// C#
+		delay_msec(300);
+		set_motor_freq(587);			// D
 		delay_msec(300);
 		set_motor_freq(659);			// E
 		delay_msec(300);

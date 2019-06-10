@@ -28,7 +28,7 @@ extern volatile uint32_t                delay_counter;              // counts do
 
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 

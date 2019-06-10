@@ -26,10 +26,10 @@ void SysTick_Handler(void);                                                     
 void
 SysTick_Handler(void)
 {
-    if (delay_counter > 0)
-    {
-        delay_counter--;
-    }
+	if (delay_counter > 0)
+	{
+		delay_counter--;
+	}
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------
@@ -39,19 +39,19 @@ SysTick_Handler(void)
 void
 delay_usec (uint32_t usec)
 {
-    if (resolution == DELAY_RESOLUTION_1_US)
-    {
-        delay_counter = usec;
-    }
-    else
-    {
-        delay_counter = usec / resolution;
-    }
+	if (resolution == DELAY_RESOLUTION_1_US)
+	{
+		delay_counter = usec;
+	}
+	else
+	{
+		delay_counter = usec / resolution;
+	}
 
-    while (delay_counter != 0)
-    {
-        ;
-    }
+	while (delay_counter != 0)
+	{
+		;
+	}
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------
@@ -61,12 +61,12 @@ delay_usec (uint32_t usec)
 void
 delay_msec (uint32_t msec)
 {
-    delay_counter = msec * msec_factor;
+	delay_counter = msec * msec_factor;
 
-    while (delay_counter != 0)
-    {
-        ;
-    }
+	while (delay_counter != 0)
+	{
+		;
+	}
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------
@@ -76,10 +76,10 @@ delay_msec (uint32_t msec)
 void
 delay_sec (uint32_t sec)
 {
-    while (sec--)
-    {
-        delay_msec (1000);
-    }
+	while (sec--)
+	{
+		delay_msec (1000);
+	}
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------
@@ -89,16 +89,16 @@ delay_sec (uint32_t sec)
 void
 delay_init (uint_fast8_t res)
 {
-    uint32_t    divider;
+	uint32_t    divider;
 
-    if (res == 0)
-    {
-        res = DELAY_RESOLUTION_100_US;                          // default is resolution of 100us
-    }
+	if (res == 0)
+	{
+		res = DELAY_RESOLUTION_100_US;                          // default is resolution of 100us
+	}
 
-    divider         = 1000000 / res;
-    msec_factor     = 1000 / res;
+	divider         = 1000000 / res;
+	msec_factor     = 1000 / res;
 
-    SysTick_Config (SystemCoreClock / divider);
-    resolution = res;
+	SysTick_Config (SystemCoreClock / divider);
+	resolution = res;
 }

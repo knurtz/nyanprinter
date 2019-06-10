@@ -45,7 +45,7 @@ void set_motor_freq(uint16_t hz) {
 
 	if (hz < 50 || hz > 1100) return;
 
-	TIM2->CCR1 = 500000 / hz;		// new oc value is half of the new period
-	TIM2->ARR = 1000000 / hz;		// new timer period
+	//TIM2->CCR1 = 500000 / hz;		// new oc value is half of the new period
+	TIM2->ARR = 1000000 / hz;		// new timer period, timer runs at 1 MHz
 
 }
