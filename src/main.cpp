@@ -43,6 +43,8 @@ int main(void) {
 
 		set_motor_freq(NOTE_A << 1);			// A
 		TIM_Cmd(TIM2, ENABLE);
+
+
 		delay_msec(300);
 		set_motor_freq(NOTE_GIS << 1);			// G#
 		delay_msec(300);
@@ -74,6 +76,7 @@ int main(void) {
 		delay_msec(300);
 
 		TIM_Cmd(TIM2, DISABLE);
+
 
 		led_half_blink();
 
