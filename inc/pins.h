@@ -35,6 +35,11 @@
 #define MOTOR_EN_SET_STATE			Bit_RESET
 #define MOTOR_EN_RESET_STATE		Bit_SET
 
+#define MOTOR_DIR_PORT				GPIOB
+#define MOTOR_DIR_PIN				GPIO_Pin_14
+#define MOTOR_DIR_FORWARD			Bit_RESET
+#define	MOTOR_DIR_BACKWARD			Bit_SET
+
 
 // ******** PRINTER pins ***********
 #define PRINTER_STROBE_PORT         GPIOA

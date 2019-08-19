@@ -10,10 +10,10 @@
 
 #include "pins.h"
 
-uint8_t foo = 0;
+uint8_t cycle = 0;
 
 
-// TIM1 update (printer clk timer)
+// TIM1 update (parallel data clock)
 void TIM1_UP_IRQHandler() {
 	// this triggers whenever the printer has received a full new line of image data (64 transfers)
 	if (TIM_GetITStatus(TIM1, TIM_IT_Update) != RESET) {
@@ -26,21 +26,24 @@ void TIM1_UP_IRQHandler() {
 }
 
 
-// TIM2 update (motor step timer)
+// TIM2 update (motor steps)
 void TIM2_IRQHandler() {
 	// this triggers whenever the motor gets a new step impulse
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET) {
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 
-		// every other motor pulse switch between:
-		if (foo) TIM_Cmd(TIM1, ENABLE);		// transferring new image data
-		else TIM_Cmd(TIM3, ENABLE);			// and firing strobe
-		foo = !foo;
+		// every other motor pulse alternate between
+		if (cycle = !cycle) TIM_Cmd(TIM1, ENABLE);		// transferring new image data // @suppress("Assignment in condition")
+		else {
+			TIM_Cmd(TIM3, ENABLE);						// and firing strobe
+			GPIO_WriteBit(MOTOR_DIR_PORT, MOTOR_DIR_PIN, MOTOR_DIR_FORWARD);	// reset motor direction every time when firing strobe
+		}
 	}
 }
 
 
 // DMA1 channel2
+//
 void DMA1_Channel2_IRQHandler() {
 	// this triggers whenever the image buffer has been transferred completely (all lines)
 	if (DMA_GetFlagStatus(DMA1_FLAG_TC2) != RESET) {

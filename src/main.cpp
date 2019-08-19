@@ -41,42 +41,8 @@ int main(void) {
 
 		delay_msec(1000);
 
-		set_motor_freq(NOTE_A << 1);			// A
+		set_motor_freq(NOTE_A);
 		TIM_Cmd(TIM2, ENABLE);
-
-
-		delay_msec(300);
-		set_motor_freq(NOTE_GIS << 1);			// G#
-		delay_msec(300);
-		set_motor_freq(NOTE_FIS << 1);			// F#
-		delay_msec(300);
-		set_motor_freq(NOTE_E << 1);			// E
-		delay_msec(300);
-		set_motor_freq(NOTE_D << 1);			// D
-		delay_msec(300);
-		set_motor_freq(NOTE_CIS << 1);			// C#
-		delay_msec(300);
-		set_motor_freq(NOTE_H);			// B
-		delay_msec(300);
-		set_motor_freq(NOTE_A);			// A
-		delay_msec(300);
-		set_motor_freq(NOTE_GIS);			// G#
-		delay_msec(300);
-		set_motor_freq(NOTE_FIS);			// F#
-		delay_msec(300);
-		set_motor_freq(NOTE_E);			// E
-		delay_msec(300);
-		set_motor_freq(NOTE_D);			// D
-		delay_msec(300);
-		set_motor_freq(NOTE_CIS);			// C#
-		delay_msec(300);
-		set_motor_freq(NOTE_H >> 1);			// B
-		delay_msec(300);
-		set_motor_freq(NOTE_A >> 1);			// A
-		delay_msec(300);
-
-		TIM_Cmd(TIM2, DISABLE);
-
 
 		led_half_blink();
 
