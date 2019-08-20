@@ -123,10 +123,11 @@ void motor_step_init() {
 	TIM_TimeBaseInitTypeDef timerInitStructure;
 	timerInitStructure.TIM_Prescaler = 71;								// frequency for TIM2: 1 MHz
 	timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	timerInitStructure.TIM_Period = 2000;								// default 500 Hz, motor speed can be updated with set_motor_freq(uint16_t hz) in helper.c
+	timerInitStructure.TIM_Period = 1000;								// default 500 Hz, motor speed can be updated with set_motor_freq(uint16_t hz) in helper.c
 	timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	timerInitStructure.TIM_RepetitionCounter = 0;
 	TIM_TimeBaseInit(TIM2, &timerInitStructure);
+	TIM_ARRPreloadConfig(TIM2, ENABLE);
 
 	TIM_OCInitTypeDef outputChannelInit;
 	outputChannelInit.TIM_OCMode = TIM_OCMode_PWM2;						// set output high if counter > pulse --> pattern "low - high"

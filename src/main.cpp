@@ -39,8 +39,6 @@ int main(void) {
 
 	while(1) {
 
-		delay_msec(1000);
-
 		set_motor_freq(NOTE_A);
 		TIM_Cmd(TIM2, ENABLE);
 
