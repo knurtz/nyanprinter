@@ -16,7 +16,7 @@ void gpio_init() {
 	gpio_init.GPIO_Speed = GPIO_Speed_50MHz;
 
 
-	// all GPIOS of the F103 are needed in thiss project
+	// all GPIOS of the F103 are needed in this project
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
@@ -29,22 +29,27 @@ void gpio_init() {
 
 	// init LED pins
 	gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;			// normal output
-
-	gpio_init.GPIO_Pin = LED1_PIN;
-	GPIO_Init(LED1_PORT, &gpio_init);
-	GPIO_WriteBit(LED1_PORT, LED1_PIN, LED_RESET_STATE);
-
-	gpio_init.GPIO_Pin = LED2_PIN;
-	GPIO_Init(LED2_PORT, &gpio_init);
-	GPIO_WriteBit(LED2_PORT, LED2_PIN, LED_RESET_STATE);
-
-	gpio_init.GPIO_Pin = LED3_PIN;
-	GPIO_Init(LED3_PORT, &gpio_init);
-	GPIO_WriteBit(LED3_PORT, LED3_PIN, LED_RESET_STATE);
+	gpio_init.GPIO_Pin = LED1_PIN | LED2_PIN | LED3_PIN;
+	GPIO_Init(LED1_PORT, &gpio_init);				// only works because I know they are on the same port!
+	GPIO_WriteBit(LED1_PORT, LED1_PIN | LED2_PIN | LED3_PIN, LED_RESET_STATE);
 
 	gpio_init.GPIO_Pin = LED4_PIN;
 	GPIO_Init(LED4_PORT, &gpio_init);
 	GPIO_WriteBit(LED4_PORT, LED4_PIN, LED_RESET_STATE);
+
+
+	// init SPI LED driver pins
+	gpio_init.GPIO_Pin = LED_CS_PIN;
+	GPIO_Init(LED_CS_PORT, &gpio_init);
+	GPIO_WriteBit(LED_CS_PORT, LED_CS_PIN, LED_CS_RESET_STATE);
+
+	gpio_init.GPIO_Mode = GPIO_Mode_AF_PP;			// alternate function means SPI related outputs
+	gpio_init.GPIO_Pin = LED_MOSI_PIN | LED_CLOCK_PIN;
+	GPIO_Init(LED_MOSI_PORT, &gpio_init);			// only works because I know they are on the same port!
+
+	gpio_init.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	gpio_init.GPIO_Pin = LED_MISO_PIN;
+	GPIO_Init(LED_MISO_PORT, &gpio_init);
 
 
 	// init motor pins
@@ -209,4 +214,8 @@ void image_dma_init(const uint8_t *image_buffer, uint16_t image_length) {
 
 }
 
+void led_spi_init() {
 
+
+
+}

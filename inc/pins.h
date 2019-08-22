@@ -9,7 +9,7 @@
 #define PINS_H_
 
 
-// ******** LED pins ***********
+// ******** Onboard LED pins ***********
 #define LED1_PORT                   GPIOA
 #define LED1_PIN                    GPIO_Pin_15
 
@@ -24,6 +24,22 @@
 
 #define LED_SET_STATE				Bit_SET
 #define LED_RESET_STATE				Bit_RESET
+
+
+// ******** SPI LED driver pins ***********
+#define LED_CS_PORT	 				GPIOA
+#define LED_CS_PIN					GPIO_Pin_2
+#define LED_CS_SET_STATE			Bit_RESET
+#define LED_CS_RESET_STATE			Bit_SET
+
+#define LED_CLOCK_PORT				GPIOB
+#define LED_CLOCK_PIN				GPIO_Pin_3
+
+#define LED_MISO_PORT				GPIOB
+#define LED_MISO_PIN				GPIO_Pin_4
+
+#define LED_MOSI_PORT				GPIOB
+#define LED_MOSI_PIN				GPIO_Pin_5
 
 
 // ******** MOTOR pins ***********
