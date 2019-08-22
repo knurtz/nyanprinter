@@ -10,10 +10,11 @@
 
 #include "pins.h"
 
+
 uint8_t cycle = 0;
 
 
-// TIM1 update (parallel data clock)
+// TIM1 update (printer image data clock)
 void TIM1_UP_IRQHandler() {
 	// this triggers whenever the printer has received a full new line of image data (64 transfers)
 	if (TIM_GetITStatus(TIM1, TIM_IT_Update) != RESET) {
@@ -42,8 +43,7 @@ void TIM2_IRQHandler() {
 }
 
 
-// DMA1 channel2
-//
+// DMA1 channel2 (printer image data)
 void DMA1_Channel2_IRQHandler() {
 	// this triggers whenever the image buffer has been transferred completely (all lines)
 	if (DMA_GetFlagStatus(DMA1_FLAG_TC2) != RESET) {
@@ -53,3 +53,13 @@ void DMA1_Channel2_IRQHandler() {
 	}
 }
 
+
+// DMA1 channel3 (SPI LED driver data)
+void DMA1_Channel3_IRQHandler() {
+	// this triggers whenever the led buffer has been transferred completely
+	if (DMA_GetFlagStatus(DMA1_FLAG_TC3) != RESET) {
+		DMA_ClearFlag(DMA1_FLAG_TC3);
+
+		//GPIO_WriteBit(LED1_PORT, LED1_PIN, GPIO_ReadOutputDataBit(LED1_PORT, LED1_PIN) ? Bit_RESET : Bit_SET);		// toggle led for debugging
+	}
+}

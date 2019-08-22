@@ -9,6 +9,7 @@
 #include "stm32f10x_conf.h"
 
 #include "pins.h"
+#include "helper.h"
 
 void gpio_init() {
 
@@ -214,8 +215,56 @@ void image_dma_init(const uint8_t *image_buffer, uint16_t image_length) {
 
 }
 
-void led_spi_init() {
+void led_spi_init(uint32_t led_buffer) {
 
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);					// activate clocks
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
 
+	GPIO_PinRemapConfig(GPIO_Remap_SPI1, ENABLE);						// we use remapped pins for SPI1
+
+	// SPI Master configuration
+	SPI_InitTypeDef  SPI_InitStructure;
+	SPI_InitStructure.SPI_Direction = SPI_Direction_1Line_Tx;
+	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
+	SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;							// idle clock state is low for MAX6966
+	SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;						// MAX6966 copies data on rising edge
+	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;							// we use a separate GPIO for CS, not the dedicated hardware pin
+	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8;	// max data clock speed for MAX6966 is about 26 MHz
+	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
+	SPI_InitStructure.SPI_CRCPolynomial = 0;
+	SPI_Init(SPI1, &SPI_InitStructure);
+
+	// SPI Master Tx_DMA_Channel configuration
+	DMA_DeInit(DMA1_Channel3);
+	DMA_InitTypeDef  DMA_InitStructure;
+	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)SPI1->DR;		// copy to SPI1 data register
+	DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)led_buffer;		// copy from led buffer
+	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralDST;
+	DMA_InitStructure.DMA_BufferSize = 1;
+	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
+	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
+	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+	DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;						// transfer led buffer once, then deactivate
+	DMA_InitStructure.DMA_Priority = DMA_Priority_VeryHigh;
+	DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
+	DMA_Init(DMA1_Channel3, &DMA_InitStructure);
+	SPI_I2S_DMACmd(SPI1, SPI_I2S_DMAReq_Tx, ENABLE);					// empty TX buffer in SPI1 triggers DMA to send new data
+
+	// activate transfer complete interrupt for debugging
+	NVIC_InitTypeDef nvicStructure;
+	nvicStructure.NVIC_IRQChannel = DMA1_Channel3_IRQn;
+	nvicStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	nvicStructure.NVIC_IRQChannelSubPriority = 1;
+	nvicStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&nvicStructure);
+	DMA_ITConfig(DMA1_Channel3, DMA_IT_TC, ENABLE);
+
+	// send initialization data to led driver
+	spi_led_send(0x10, 0b00100001);						// bit0: run mode, bit5: enable pwm stagger
+	// spi_led_send(0x13, 0xff);						// set outputs 0 to 7 to full current instead of half
+	// spi_led_send(0x14, 0xff);						// same for outputs 8 and 9
+	// spi_led_send(0x15, 0b011);						// full current = 10 mA, half current = 5 mA
 
 }

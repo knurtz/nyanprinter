@@ -49,3 +49,24 @@ void set_motor_freq(uint16_t hz) {
 	TIM2->ARR = 1000000 / hz;		// new timer period, timer runs at 1 MHz
 
 }
+
+
+void spi_led_send(uint8_t addr, uint8_t data) {
+
+	GPIO_WriteBit(LED_CS_PORT, LED_CS_PIN, LED_CS_SET_STATE);
+
+	while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+	SPI_I2S_SendData(SPI1, addr);
+	while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+	SPI_I2S_SendData(SPI1, data);
+
+	GPIO_WriteBit(LED_CS_PORT, LED_CS_PIN, LED_CS_RESET_STATE);
+
+}
+
+
+void spi_led_clear() {
+
+	spi_led_send(0x0a, 0xff);		// special command to set all outputs simultaneously
+
+}
