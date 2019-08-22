@@ -50,8 +50,6 @@ uint8_t led_buffer[20] = {
 	9, 0xff
 };
 
-uint8_t
-
 
 int main(void) {
 
