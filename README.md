@@ -13,7 +13,7 @@ This is the solution I came up with: If the printer encounters a line with more 
 
 ## Hardware
 
-- STM32F103 Bluepill Development Board: [stm32duino.com](https://wiki.stm32duino.com/index.php?title=Blue_Pill)
+- STM32F103 Bluepill Development Board: [stm32duino.com](https://web.archive.org/web/20190524151648/https://wiki.stm32duino.com/index.php?title=Blue_Pill)
 - Thermal printer MATSUSHITA EPL1801S2E from [pollin.de](https://www.pollin.de/p/thermo-druckelement-matsushita-epl1801s2e-721066)
 - an awesome huge blue push button from [Amazon](https://www.amazon.de/gp/product/B07BSFMZJ2) (it lights up, too!)
 - A4988 stepper motor driver board like this one from [pololu.com](https://www.pololu.com/product/1182)
