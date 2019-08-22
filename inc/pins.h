@@ -53,8 +53,8 @@
 
 #define MOTOR_DIR_PORT				GPIOB
 #define MOTOR_DIR_PIN				GPIO_Pin_14
-#define MOTOR_DIR_FORWARD			Bit_RESET
-#define	MOTOR_DIR_BACKWARD			Bit_SET
+#define MOTOR_DIR_FORWARD			Bit_SET
+#define	MOTOR_DIR_BACKWARD			Bit_RESET
 
 
 // ******** PRINTER pins ***********
