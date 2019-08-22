@@ -29,6 +29,6 @@ if pwm_range <= 0 or period <= 0 or total_frames == 0:
 output_list = []
 
 for x in range (0, total_frames):
-	output_list.append(int((exp(-cos(2*pi*(x/total_frames)))-1/e)*(255/(e-1/e))))
+	output_list.append(int(pwm_min + (exp(-cos(2*pi*(x/total_frames)))-1/e)*(pwm_range/(e-1/e))))
 
 print(output_list)
