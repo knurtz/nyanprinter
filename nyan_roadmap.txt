@@ -69,27 +69,27 @@ TIM1:
 - after 64 repetitions: Interrupt that triggers latch (update interrupt)
 
 TIM2:
-- generiert Schrittimpulse für den Motor -> TIM2_CH1-Output an step-Pin
-- Frequenz: 10 kHz
-- Zählperiode: entsprechend für Frequenz der aktuellen Note
-- Channel 1 compare: 50 % der Zählperiode
-- PWM mode: 2 (Muster "high - low")
-- update interrupt: aktiviere TIM1 für Datenübertragung bzw. TIM3 für strobe-Impuls
-- Plan fürs Ende: läuft im slave mode, wird kontrolliert von TIM4
+- generates step signal for motor -> TIM2_CH1 output to stop pin
+- frequency: 1 MHz -> could be adjusted "on the fly" to change pitch
+- period: either fixed to 1000 or adjusted to change pitch
+- channel 1 compare value: 50 % duty cycle
+- PWM mode: 2 ("high - low")
+- update interrupt: activates TIM1 to transfer new data or TIM3 for strobe impulse (switch between the two every other update)
+- plan for later: turned on or off by TIM4 to control tone length
 
 TIM3:
-- generiert strobe-Impuls -> TIM3_CH1-Output an strobe-Pin
-- gestartet in ISR von TIM2 update
-- Frequenz: 1 MHz
-- Zählperiode: 750 (Bsp. für benötigten strobe-Impuls von rund 750 us)
-- Channel 1 compare: 1 (damit Ausgang nach Update low bleibt, aber sofort mit Start des Timers high geht)
-- PWM mode: 1 (Muster "low - high")
-- one-pulse mode
+- generates strobe impulse -> TIM3_CH1 output to strobe pin
+- startet inside ISR of TIM2 update event
+- frequency: 1 MHz
+- period: 750 (for 750 us strobe length, depends on voltage and paper)
+- channel 1 compare: 1 (so the output stays off when timer is reset, but goes high immediately after starting the timer)
+- PWM mode: 1 ("low - high")
+- one-pulse mode -> fires once and shuts itself down after that
 
 TIM4:
-- generiert Aktivierungssignal für TIM2
-- kontrolliert damit die Tonlänge und gibt ein Interrupt, wenn der nächste Ton beginnen soll
-- Tonhöhe und Länge zunächst im main loop einstellen, dann TIM4 dafür nutzen
+- might control TIM2 later
+- by doing so, it controls the tone length and givs an interrupt when the next note is needed
+- however, for now the note length and pitch will be monitored in the main loop
 
 USART1:
 - asynchronous mode
