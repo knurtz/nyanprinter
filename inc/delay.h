@@ -21,10 +21,13 @@
 #define DELAY_RESOLUTION_5_US             5
 #define DELAY_RESOLUTION_10_US           10
 #define DELAY_RESOLUTION_100_US         100
+#define DELAY_RESOLUTION_1_MS          1000
 
-#define DELAY_DEFAULT_RESOLUTION        DELAY_RESOLUTION_100_US
+#define DELAY_DEFAULT_RESOLUTION        DELAY_RESOLUTION_1_MS
 
 extern volatile uint32_t                delay_counter;              // counts down in units of resolution
+extern volatile uint32_t				uptime_counter;				// counts system uptime in units of resolution since delay_init()
+extern volatile uint8_t			        systick_interrupt = 0;		// can be used in main loop to do schedule stuff
 
 
 #ifdef __cplusplus

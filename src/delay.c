@@ -16,6 +16,8 @@ static uint_fast8_t         resolution  = DELAY_DEFAULT_RESOLUTION;             
 static uint32_t             msec_factor = 1000 / DELAY_DEFAULT_RESOLUTION;      // factor for msec delays
 
 volatile uint32_t           delay_counter;                                      // counts down in units of resolution, see above
+volatile uint32_t			uptime_counter = 0;									// counts system uptime in units of resolution
+volatile uint8_t			systick_interrupt = 0;								// can be used in main loop to do schedule stuff
 
 void SysTick_Handler(void);                                                     // keep compiler happy
 
@@ -23,63 +25,42 @@ void SysTick_Handler(void);                                                     
  * SysTick_Handler() - decrement delay_counter
  *-------------------------------------------------------------------------------------------------------------------------------------------
  */
-void
-SysTick_Handler(void)
+void SysTick_Handler(void)
 {
-	if (delay_counter > 0)
-	{
-		delay_counter--;
-	}
+	if (delay_counter > 0) delay_counter--;
+	uptime_counter++;
+	systick_int = 1;
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------
  * delay_usec() - delay n microseconds (usec)
  *-------------------------------------------------------------------------------------------------------------------------------------------
  */
-void
-delay_usec (uint32_t usec)
+void delay_usec (uint32_t usec)
 {
-	if (resolution == DELAY_RESOLUTION_1_US)
-	{
-		delay_counter = usec;
-	}
-	else
-	{
-		delay_counter = usec / resolution;
-	}
+	if (resolution == DELAY_RESOLUTION_1_US) delay_counter = usec;
+	else delay_counter = usec / resolution;
 
-	while (delay_counter != 0)
-	{
-		;
-	}
+	while (delay_counter != 0);
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------
  * delay_msec() - delay n milliseconds (msec)
  *-------------------------------------------------------------------------------------------------------------------------------------------
  */
-void
-delay_msec (uint32_t msec)
+void delay_msec (uint32_t msec)
 {
 	delay_counter = msec * msec_factor;
-
-	while (delay_counter != 0)
-	{
-		;
-	}
+	while (delay_counter != 0);
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------
  * delay_msec() - delay n seconds (sec)
  *-------------------------------------------------------------------------------------------------------------------------------------------
  */
-void
-delay_sec (uint32_t sec)
+void delay_sec (uint32_t sec)
 {
-	while (sec--)
-	{
-		delay_msec (1000);
-	}
+	while (sec--) delay_msec(1000);
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------
@@ -89,16 +70,13 @@ delay_sec (uint32_t sec)
 void
 delay_init (uint_fast8_t res)
 {
-	uint32_t    divider;
+	if (res == 0) res = DELAY_DEFAULT_RESOLUTION;
 
-	if (res == 0)
-	{
-		res = DELAY_RESOLUTION_100_US;                          // default is resolution of 100us
-	}
+	uint32_t divider         = 1000000 / res;
+	msec_factor              = 1000 / res;
 
-	divider         = 1000000 / res;
-	msec_factor     = 1000 / res;
-
-	SysTick_Config (SystemCoreClock / divider);
+	SysTick_Config(SystemCoreClock / divider);
 	resolution = res;
+
+	uptime_counter = 0;
 }
