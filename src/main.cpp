@@ -19,8 +19,8 @@
 #include "pins.h"
 #include "notes.h"
 
-//#include "image_nyan_loop.h"
-#include "image_test.h"
+#include "image_nyan_start.h"
+//#include "image_test.h"
 
 #define FRAMERATE				25
 #define FRAME_PERIOD			40
@@ -57,10 +57,9 @@ int main(void) {
 	printer_clk_init();
 	motor_step_init();
 	printer_strobe_init();
-	image_dma_init(image_test, image_test_length);
+	//image_dma_init(image_test, image_test_length);
+	image_dma_init(image_nyan_start, image_nyan_start_length);
 	led_spi_init();
-	//image_dma_init(image_nyan_loop, image_nyan_loop_length);
-
 
 	// enable motor
 	GPIO_WriteBit(MOTOR_EN_PORT, MOTOR_EN_PIN, MOTOR_EN_SET_STATE);
