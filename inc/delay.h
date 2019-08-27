@@ -27,7 +27,7 @@
 
 extern volatile uint32_t                delay_counter;              // counts down in units of resolution
 extern volatile uint32_t				uptime_counter;				// counts system uptime in units of resolution since delay_init()
-extern volatile uint8_t			        systick_interrupt = 0;		// can be used in main loop to do schedule stuff
+extern volatile uint8_t			        systick_int;		// can be used in main loop to do schedule stuff
 
 
 #ifdef __cplusplus

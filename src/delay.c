@@ -17,7 +17,7 @@ static uint32_t             msec_factor = 1000 / DELAY_DEFAULT_RESOLUTION;      
 
 volatile uint32_t           delay_counter;                                      // counts down in units of resolution, see above
 volatile uint32_t			uptime_counter = 0;									// counts system uptime in units of resolution
-volatile uint8_t			systick_interrupt = 0;								// can be used in main loop to do schedule stuff
+volatile uint8_t			systick_int = 0;								// can be used in main loop to do schedule stuff
 
 void SysTick_Handler(void);                                                     // keep compiler happy
 

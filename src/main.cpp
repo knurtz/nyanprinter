@@ -19,7 +19,7 @@
 #include "pins.h"
 #include "notes.h"
 
-#include "image_test.h"
+#include "image_nyan_loop.h"
 
 #define LED_FRAMEPERIOD		40
 #define LED_FRAMERATE		25
@@ -62,7 +62,7 @@ int main(void) {
 	printer_clk_init();
 	motor_step_init();
 	printer_strobe_init();
-	image_dma_init(image_test, image_test_length);
+	image_dma_init(image_nyan_loop, image_nyan_loop_length);
 
 
 	// enable motor
@@ -73,8 +73,8 @@ int main(void) {
 	while(1) {
 
 		// wait until another interval of delay resolution has passed
-		while(!systick_interrupt);
-		systick_interrupt = 0;
+		while(!systick_int);
+		systick_int = 0;
 
 		// if uptime_counter > next_note_time --> set next note / pause
 
