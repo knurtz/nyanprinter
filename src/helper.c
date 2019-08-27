@@ -56,10 +56,8 @@ void spi_led_send(uint8_t addr, uint8_t data) {
 	GPIO_WriteBit(LED_CS_PORT, LED_CS_PIN, LED_CS_SET_STATE);
 
 	while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
-	SPI_I2S_SendData(SPI1, addr);
+	SPI_I2S_SendData(SPI1, (addr << 8) | data);
 	while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
-	SPI_I2S_SendData(SPI1, data);
-
 	GPIO_WriteBit(LED_CS_PORT, LED_CS_PIN, LED_CS_RESET_STATE);
 
 }

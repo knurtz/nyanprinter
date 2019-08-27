@@ -11,7 +11,7 @@
 #include "pins.h"
 
 
-uint8_t cycle = 0;
+volatile uint8_t cycle = 0;
 
 
 // TIM1 update (printer image data clock)
@@ -23,6 +23,7 @@ void TIM1_UP_IRQHandler() {
 		// trigger latch so printer copies data from shift registers
 		GPIO_WriteBit(PRINTER_LATCH_PORT, PRINTER_LATCH_PIN, PRINTER_LATCH_SET_STATE);
 		GPIO_WriteBit(PRINTER_LATCH_PORT, PRINTER_LATCH_PIN, PRINTER_LATCH_RESET_STATE);
+		//GPIO_WriteBit(LED4_PORT, LED4_PIN, Bit_SET);
 	}
 }
 
@@ -49,7 +50,7 @@ void DMA1_Channel2_IRQHandler() {
 	if (DMA_GetFlagStatus(DMA1_FLAG_TC2) != RESET) {
 		DMA_ClearFlag(DMA1_FLAG_TC2);
 
-		GPIO_WriteBit(LED1_PORT, LED1_PIN, GPIO_ReadOutputDataBit(LED1_PORT, LED1_PIN) ? Bit_RESET : Bit_SET);		// toggle led for debugging
+		//GPIO_WriteBit(LED3_PORT, LED3_PIN, Bit_SET);		// toggle led for debugging
 	}
 }
 

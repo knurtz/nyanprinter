@@ -24,8 +24,8 @@ void gpio_init() {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 
 
-	// disable JTAG so all pins other than SWD are available
-	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);			// disable JTAG so all pins other than SWD are available
+	GPIO_PinRemapConfig(GPIO_Remap_SPI1, ENABLE);						// we use remapped pins for SPI1
 
 
 	// init LED pins
@@ -103,7 +103,6 @@ void printer_clk_init() {
 	outputChannelInit.TIM_OutputState = TIM_OutputState_Enable;
 	outputChannelInit.TIM_OCPolarity = TIM_OCPolarity_High;
 	TIM_OC1Init(TIM1, &outputChannelInit);
-	TIM_OC1PreloadConfig(TIM1, TIM_OCPreload_Enable);
 	TIM_CtrlPWMOutputs(TIM1, ENABLE);
 
 	NVIC_InitTypeDef nvicStructure;
@@ -215,26 +214,26 @@ void image_dma_init(const uint8_t *image_buffer, uint16_t image_length) {
 
 }
 
-void led_spi_init(uint32_t led_buffer) {
+void led_spi_init(/*uint32_t led_buffer*/) {
 
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);					// activate clocks
+	//RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);					// activate clocks
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
-
-	GPIO_PinRemapConfig(GPIO_Remap_SPI1, ENABLE);						// we use remapped pins for SPI1
 
 	// SPI Master configuration
 	SPI_InitTypeDef  SPI_InitStructure;
-	SPI_InitStructure.SPI_Direction = SPI_Direction_1Line_Tx;
+	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
 	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
-	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
+	SPI_InitStructure.SPI_DataSize = SPI_DataSize_16b;
 	SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;							// idle clock state is low for MAX6966
 	SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;						// MAX6966 copies data on rising edge
 	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;							// we use a separate GPIO for CS, not the dedicated hardware pin
-	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8;	// max data clock speed for MAX6966 is about 26 MHz
+	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;	// max data clock speed for MAX6966 is about 26 MHz
 	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
 	SPI_InitStructure.SPI_CRCPolynomial = 0;
 	SPI_Init(SPI1, &SPI_InitStructure);
 
+	SPI_Cmd(SPI1, ENABLE);
+/*
 	// SPI Master Tx_DMA_Channel configuration
 	DMA_DeInit(DMA1_Channel3);
 	DMA_InitTypeDef  DMA_InitStructure;
@@ -260,6 +259,7 @@ void led_spi_init(uint32_t led_buffer) {
 	nvicStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&nvicStructure);
 	DMA_ITConfig(DMA1_Channel3, DMA_IT_TC, ENABLE);
+*/
 
 	// send initialization data to led driver
 	spi_led_send(0x10, 0b00100001);						// bit0: run mode, bit5: enable pwm stagger

@@ -78,18 +78,4 @@
 #define BUTTON_PIN                  GPIO_Pin_1
 
 
-// ******** SPI LED DRIVER pins ***********
-#define SPI_CS_PORT                 GPIOA
-#define SPI_CS_PIN                  GPIO_Pin_2
-
-#define SPI_CLK_PORT                GPIOB
-#define SPI_CLK_PIN                 GPIO_Pin_3
-
-#define SPI_MISO_PORT               GPIOB
-#define SPI_MISO_PIN                GPIO_Pin_4
-
-#define SPI_MOSI_PORT               GPIOB
-#define SPI_MOSI_PIN                GPIO_Pin_5
-
-
 #endif /* PINS_H_ */

@@ -19,11 +19,15 @@
 #include "pins.h"
 #include "notes.h"
 
-#include "image_nyan_loop.h"
+//#include "image_nyan_loop.h"
+#include "image_test.h"
 
 #define LED_FRAMEPERIOD		40
 #define LED_FRAMERATE		25
 #define BREATHING_PERIOD	5
+
+uint8_t current_frame = 0;
+int frametime_counter = 0;
 
 uint8_t breathing_table[] = {
 		3, 3, 3, 3, 3, 4, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17,
@@ -37,6 +41,7 @@ uint8_t breathing_table[] = {
 		19, 17, 15, 13, 11, 10, 9, 8, 7, 6, 5, 4, 4, 3, 3, 3, 3
 };
 
+/*
 uint8_t led_buffer[20] = {
 	0, 0xff,
 	1, 0xff,
@@ -49,7 +54,7 @@ uint8_t led_buffer[20] = {
 	8, 0xff,
 	9, 0xff
 };
-
+*/
 
 int main(void) {
 
@@ -62,12 +67,14 @@ int main(void) {
 	printer_clk_init();
 	motor_step_init();
 	printer_strobe_init();
-	image_dma_init(image_nyan_loop, image_nyan_loop_length);
+	image_dma_init(image_test, image_test_length);
+	led_spi_init();
+	//image_dma_init(image_nyan_loop, image_nyan_loop_length);
 
 
 	// enable motor
 	GPIO_WriteBit(MOTOR_EN_PORT, MOTOR_EN_PIN, MOTOR_EN_SET_STATE);
-	set_motor_freq(NOTE_A);
+	set_motor_freq(NOTE_D);
 	TIM_Cmd(TIM2, ENABLE);
 
 	while(1) {
@@ -78,11 +85,17 @@ int main(void) {
 
 		// if uptime_counter > next_note_time --> set next note / pause
 
-		// if uptime counter > next led frame --> calculate next animation frame and update spi leds
 
+		if (frametime_counter >= LED_FRAMEPERIOD) {
+			frametime_counter = 0;
+			spi_led_send(4, breathing_table[current_frame++]);			// update debug led attached to P4
+			if (current_frame >= (LED_FRAMERATE * BREATHING_PERIOD)) {		// check for end of animation loop
+				led_half_blink();
+				current_frame = 0;
+			}
+		}
 
-		led_half_blink();
-
+		frametime_counter++;			// systick configured to 1000 Hz -> counts milliseconds
 	}
 
 	return 0;
