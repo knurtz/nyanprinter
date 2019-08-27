@@ -88,10 +88,7 @@ int main(void) {
 		if (frametime_counter >= LED_FRAMEPERIOD) {
 			frametime_counter = 0;
 			spi_led_send(4, breathing_table[current_frame++]);			// update debug led attached to P4
-			if (current_frame >= (LED_FRAMERATE * BREATHING_PERIOD)) {		// check for end of animation loop
-				led_half_blink();
-				current_frame = 0;
-			}
+			if (current_frame >= (LED_FRAMERATE * BREATHING_PERIOD)) current_frame = 0;
 		}
 
 		frametime_counter++;			// systick configured to 1000 Hz -> counts milliseconds

@@ -263,8 +263,8 @@ void led_spi_init(/*uint32_t led_buffer*/) {
 
 	// send initialization data to led driver
 	spi_led_send(0x10, 0b00100001);						// bit0: run mode, bit5: enable pwm stagger
-	// spi_led_send(0x13, 0xff);						// set outputs 0 to 7 to full current instead of half
-	// spi_led_send(0x14, 0xff);						// same for outputs 8 and 9
+	spi_led_send(0x13, 0xff);						// set outputs 0 to 7 to full current instead of half
+	spi_led_send(0x14, 0xff);						// same for outputs 8 and 9
 	// spi_led_send(0x15, 0b011);						// full current = 10 mA, half current = 5 mA
 
 }
