@@ -22,12 +22,17 @@
 //#include "image_nyan_loop.h"
 #include "image_test.h"
 
-#define LED_FRAMEPERIOD		40
-#define LED_FRAMERATE		25
-#define BREATHING_PERIOD	4
+#define FRAMERATE				25
+#define FRAME_PERIOD			40
+#define BREATHING_PERIOD		4
+
+#define MUSIC_BPM				120
+const int thirtysecond = (60000 / MUSIC_BPM) >> 5;		// amount of milliseconds for one thirtysecond note
+
+int frametimer = 0;				// stores duration since last frame update, counts up
+int musictimer = 0;				// stores the duration until the next note, counts down
 
 uint8_t current_frame = 0;
-int frametime_counter = 0;
 
 uint8_t breathing_table[] = {
 	3, 3, 3, 3, 4, 4, 5, 6, 8, 9, 11, 13, 15, 17, 20,
@@ -40,20 +45,6 @@ uint8_t breathing_table[] = {
 	20, 17, 15, 13, 11, 9, 8, 6, 5, 4, 4, 3, 3, 3
 };
 
-/*
-uint8_t led_buffer[20] = {
-	0, 0xff,
-	1, 0xff,
-	2, 0xff,
-	3, 0xff,
-	4, 0xff,
-	5, 0xff,
-	6, 0xff,
-	7, 0xff,
-	8, 0xff,
-	9, 0xff
-};
-*/
 
 int main(void) {
 
@@ -82,16 +73,20 @@ int main(void) {
 		while(!systick_int);
 		systick_int = 0;
 
-		// if uptime_counter > next_note_time --> set next note / pause
+		// if (musictimer >= music_interval)
+		// get next note / pause from song array
+		// set pitch or disable motor for a pause
+		// calculate new value for musictimer
+		// musictimer = thirtysecond << 2		// example for one sixteenth length
 
-
-		if (frametime_counter >= LED_FRAMEPERIOD) {
-			frametime_counter = 0;
+		if (frametimer >= FRAME_PERIOD) {
+			frametimer = 0;
 			spi_led_send(4, breathing_table[current_frame++]);			// update debug led attached to P4
-			if (current_frame >= (LED_FRAMERATE * BREATHING_PERIOD)) current_frame = 0;
+			if (current_frame >= (FRAMERATE * BREATHING_PERIOD)) current_frame = 0;
 		}
 
-		frametime_counter++;			// systick configured to 1000 Hz -> counts milliseconds
+		musictimer--;
+		frametimer++;			// systick configured to 1000 Hz -> counts milliseconds
 	}
 
 	return 0;
