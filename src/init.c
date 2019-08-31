@@ -25,7 +25,7 @@ void gpio_init() {
 
 
 	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);			// disable JTAG so all pins other than SWD are available
-	GPIO_PinRemapConfig(GPIO_Remap_SPI1, ENABLE);						// we use remapped pins for SPI1
+	GPIO_PinRemapConfig(GPIO_Remap_SPI1, ENABLE);						// use remapped pins for SPI1
 
 
 	// init LED pins
@@ -72,7 +72,7 @@ void gpio_init() {
 	gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;			// normal output
 	gpio_init.GPIO_Pin = PRINTER_LATCH_PIN;
 	GPIO_Init(PRINTER_LATCH_PORT, &gpio_init);
-	GPIO_WriteBit(PRINTER_LATCH_PORT, PRINTER_LATCH_PIN, PRINTER_LATCH_RESET_STATE);
+	GPIO_WriteBit(PRINTER_LATCH_PORT, PRINTER_LATCH_PIN, PRINTER_LATCH_SET_STATE);		// just keep latch open all of the time
 
 	gpio_init.GPIO_Mode = GPIO_Mode_AF_PP;			// alternate function means TIM1 CC1 output
 	gpio_init.GPIO_Pin = PRINTER_CLK_PIN;
@@ -87,12 +87,14 @@ void gpio_init() {
 // TIM1 creates clock for parallel printer data (TIM1 Channel1 -> PA8)
 void printer_clk_init() {
 
+	TIM_Cmd(TIM1, DISABLE);												// will be activated in interrupt rountine of motor step timer every other step
+
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
 
 	TIM_TimeBaseInitTypeDef timerInitStructure;
 	timerInitStructure.TIM_Prescaler = 0;								// frequency for TIM1: 72 MHz
 	timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	timerInitStructure.TIM_Period = (SystemCoreClock / 1000000) - 1;	// timer update with a frequency of 1 MHz
+	timerInitStructure.TIM_Period = (SystemCoreClock / 1000000) - 1;	// timer update with a frequency of 1 MHz -> max. CLK for printer is 8 MHz
 	timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	timerInitStructure.TIM_RepetitionCounter = 63;						// 64 cycles for one chunk of picture data (one line needs 64 bytes)
 	TIM_TimeBaseInit(TIM1, &timerInitStructure);
@@ -113,15 +115,15 @@ void printer_clk_init() {
 	NVIC_Init(&nvicStructure);
 
 	TIM_SelectOnePulseMode(TIM1, TIM_OPMode_Single);					// only fire once (each time with the amount of repetitions set earlier)
-	TIM_ITConfig(TIM1, TIM_IT_Update, ENABLE);							// update interrupt is only generated after repetition counter has reached zero
+	//TIM_ITConfig(TIM1, TIM_IT_Update, ENABLE);							// update interrupt is only generated after repetition counter has reached zero
 	TIM_DMACmd(TIM1, TIM_DMA_CC1, ENABLE);								// hook up TIM1_CH1 to DMA1 channel2 request (image dma)
-
-	TIM_Cmd(TIM1, DISABLE);												// will be activated in interrupt rountine of motor step timer every other step
 
 }
 
 // TIM2 creates motor steps (TIM2 Channel1 -> PA0)
 void motor_step_init() {
+
+	TIM_Cmd(TIM2, DISABLE);												// will be activated in main routine, whenever motor is supposed to move
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 
@@ -149,13 +151,15 @@ void motor_step_init() {
 	nvicStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&nvicStructure);
 
-	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);							// enable update interrupt triggering every motor step
+	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);							// update interrupt: simultaneously with motor step
+	//TIM_ITConfig(TIM2, TIM_IT_CC1, ENABLE);								// CC1 interrupt: in between every motor step
 
-	TIM_Cmd(TIM2, DISABLE);												// will be activated in main routine, whenever motor is supposed to move
 }
 
 // TIM3 creates strobe pulse (TIM3 Channel11 -> PA6)
 void printer_strobe_init() {
+
+	TIM_Cmd(TIM3, DISABLE);												// will be activated in interrupt rountine of motor step timer every other step
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
 
@@ -177,7 +181,6 @@ void printer_strobe_init() {
 
 	TIM_SelectOnePulseMode(TIM3, TIM_OPMode_Single);					// only fire once
 
-	TIM_Cmd(TIM3, DISABLE);												// will be activated in interrupt rountine of motor step timer every other step
 }
 
 void image_dma_init(const uint8_t *image_buffer, uint16_t image_length) {
@@ -195,7 +198,7 @@ void image_dma_init(const uint8_t *image_buffer, uint16_t image_length) {
 	dmaInitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
 	dmaInitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
 	dmaInitStructure.DMA_Mode = DMA_Mode_Circular;
-	dmaInitStructure.DMA_PeripheralBaseAddr = (uint32_t)((&PRINTER_DATA_PORT->ODR));	// output data register of GPIOB is used
+	dmaInitStructure.DMA_PeripheralBaseAddr = (uint32_t)&PRINTER_DATA_PORT->ODR;	// output data register of GPIOB is used
 	dmaInitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
 	dmaInitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
 	dmaInitStructure.DMA_Priority = DMA_Priority_High;

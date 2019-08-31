@@ -52,7 +52,7 @@ int main(void) {
 
 
 	// initialize some stuff
-	delay_init(DELAY_RESOLUTION_1_MS);				// configures systick and systick handler, restarts uptime counter
+	delay_init(DELAY_RESOLUTION_1_MS);				// configures systick and systick handler, resets uptime counter
 	gpio_init();
 	printer_clk_init();
 	motor_step_init();

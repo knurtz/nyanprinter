@@ -11,7 +11,7 @@
 #include "pins.h"
 
 
-volatile uint8_t cycle = 0;
+volatile uint8_t cycle = 1;		// cycle = 1: send new image data, cycle = 0: activate strobe
 
 
 // TIM1 update (printer image data clock)
@@ -35,12 +35,23 @@ void TIM2_IRQHandler() {
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
 
 		// every other motor pulse alternate between
-		if (cycle = !cycle) TIM_Cmd(TIM1, ENABLE);		// transferring new image data // @suppress("Assignment in condition")
+		if (cycle) TIM_Cmd(TIM1, ENABLE);		// transferring new image data
 		else {
 			TIM_Cmd(TIM3, ENABLE);						// and firing strobe
 			GPIO_WriteBit(MOTOR_DIR_PORT, MOTOR_DIR_PIN, MOTOR_DIR_FORWARD);	// reset motor direction every time when firing strobe
 		}
+		cycle = !cycle;
 	}
+
+	/*
+	// this triggers halfway in between two motor steps
+	// if we started a data transmission on the last step (cycle now = 0), it should be done by now (takes 64 us) and we can deactivate latch to safe data on printer
+	if (TIM_GetITStatus(TIM2, TIM_IT_CC1) != RESET) {
+		TIM_ClearITPendingBit(TIM2, TIM_IT_CC1);
+
+
+	}
+	*/
 }
 
 
