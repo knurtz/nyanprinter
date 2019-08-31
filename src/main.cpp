@@ -29,8 +29,8 @@
 #define MUSIC_BPM				120
 const int thirtysecond = (60000 / MUSIC_BPM) >> 5;		// amount of milliseconds for one thirtysecond note
 
-int frametimer = 0;				// stores duration since last frame update, counts up
-int musictimer = 0;				// stores the duration until the next note, counts down
+int frametimer = 0;				// duration until next frame update
+int musictimer = 0;				// duration until next note
 
 uint8_t current_frame = 0;
 
@@ -78,14 +78,14 @@ int main(void) {
 		// calculate new value for musictimer
 		// musictimer = thirtysecond << 2		// example for one sixteenth length
 
-		if (frametimer >= FRAME_PERIOD) {
-			frametimer = 0;
+		if (!frametimer) {
+			frametimer = FRAME_PERIOD;
 			spi_led_send(4, breathing_table[current_frame++]);			// update debug led attached to P4
 			if (current_frame >= (FRAMERATE * BREATHING_PERIOD)) current_frame = 0;
 		}
 
 		musictimer--;
-		frametimer++;			// systick configured to 1000 Hz -> counts milliseconds
+		frametimer--;			// systick configured to 1000 Hz -> counts milliseconds
 	}
 
 	return 0;
