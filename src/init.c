@@ -72,7 +72,7 @@ void gpio_init() {
 	gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;			// normal output
 	gpio_init.GPIO_Pin = PRINTER_LATCH_PIN;
 	GPIO_Init(PRINTER_LATCH_PORT, &gpio_init);
-	GPIO_WriteBit(PRINTER_LATCH_PORT, PRINTER_LATCH_PIN, PRINTER_LATCH_SET_STATE);		// just keep latch open all of the time
+	GPIO_WriteBit(PRINTER_LATCH_PORT, PRINTER_LATCH_PIN, PRINTER_LATCH_RESET_STATE);
 
 	gpio_init.GPIO_Mode = GPIO_Mode_AF_PP;			// alternate function means TIM1 CC1 output
 	gpio_init.GPIO_Pin = PRINTER_CLK_PIN;
@@ -105,6 +105,7 @@ void printer_clk_init() {
 	outputChannelInit.TIM_OutputState = TIM_OutputState_Enable;
 	outputChannelInit.TIM_OCPolarity = TIM_OCPolarity_High;
 	TIM_OC1Init(TIM1, &outputChannelInit);
+	TIM_OC1PreloadConfig(TIM1, TIM_OCPreload_Enable);
 	TIM_CtrlPWMOutputs(TIM1, ENABLE);
 
 	NVIC_InitTypeDef nvicStructure;
@@ -115,7 +116,7 @@ void printer_clk_init() {
 	NVIC_Init(&nvicStructure);
 
 	TIM_SelectOnePulseMode(TIM1, TIM_OPMode_Single);					// only fire once (each time with the amount of repetitions set earlier)
-	//TIM_ITConfig(TIM1, TIM_IT_Update, ENABLE);							// update interrupt is only generated after repetition counter has reached zero
+	TIM_ITConfig(TIM1, TIM_IT_Update, ENABLE);							// update interrupt is only generated after repetition counter has reached zero
 	TIM_DMACmd(TIM1, TIM_DMA_CC1, ENABLE);								// hook up TIM1_CH1 to DMA1 channel2 request (image dma)
 
 }
@@ -130,7 +131,7 @@ void motor_step_init() {
 	TIM_TimeBaseInitTypeDef timerInitStructure;
 	timerInitStructure.TIM_Prescaler = 71;								// frequency for TIM2: 1 MHz
 	timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	timerInitStructure.TIM_Period = 1000;								// default 500 Hz, motor speed can be updated with set_motor_freq(uint16_t hz) in helper.c
+	timerInitStructure.TIM_Period = 3000;								// default 500 Hz, motor speed can be updated with set_motor_freq(uint16_t hz) in helper.c
 	timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	timerInitStructure.TIM_RepetitionCounter = 0;
 	TIM_TimeBaseInit(TIM2, &timerInitStructure);
@@ -138,7 +139,7 @@ void motor_step_init() {
 
 	TIM_OCInitTypeDef outputChannelInit;
 	outputChannelInit.TIM_OCMode = TIM_OCMode_PWM2;						// set output high if counter > pulse --> pattern "low - high"
-	outputChannelInit.TIM_Pulse = 500;									// smallest clock period is 900 (for 1100 Hz) -> Pulse of 500 should always work
+	outputChannelInit.TIM_Pulse = 1500;									// smallest clock period is 900 (for 1100 Hz) -> Pulse of 800 should always work, 100 ms left for step high phase
 	outputChannelInit.TIM_OutputState = TIM_OutputState_Enable;
 	outputChannelInit.TIM_OCPolarity = TIM_OCPolarity_High;
 	TIM_OC1Init(TIM2, &outputChannelInit);
@@ -166,7 +167,7 @@ void printer_strobe_init() {
 	TIM_TimeBaseInitTypeDef timerInitStructure;
 	timerInitStructure.TIM_Prescaler = 71;								// frequency for TIM3: 1 MHz -> 1 us per timer tick
 	timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	timerInitStructure.TIM_Period = 800;								// 750 us strobe length should suffice at 8 volts... maybe 1000 is necessary
+	timerInitStructure.TIM_Period = 1000;								// 750 us strobe length should suffice at 8 volts... maybe 1000 is necessary
 	timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	timerInitStructure.TIM_RepetitionCounter = 0;						// only 1 cycle, then stop because of one pulse mode
 	TIM_TimeBaseInit(TIM3, &timerInitStructure);

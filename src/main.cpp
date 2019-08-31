@@ -19,11 +19,11 @@
 #include "pins.h"
 #include "notes.h"
 
-#include "image_nyan_start.h"
-//#include "image_test.h"
+//#include "image_nyan_start.h"
+#include "image_test.h"
 
 #define FRAMERATE				25
-#define FRAME_PERIOD			40
+#define FRAME_PERIOD			400
 #define BREATHING_PERIOD		4
 
 #define MUSIC_BPM				120
@@ -52,18 +52,18 @@ int main(void) {
 
 
 	// initialize some stuff
-	delay_init(DELAY_RESOLUTION_1_MS);				// configures systick and systick handler, resets uptime counter
+	delay_init(DELAY_RESOLUTION_10_US);				// configures systick and systick handler, resets uptime counter
 	gpio_init();
 	printer_clk_init();
 	motor_step_init();
 	printer_strobe_init();
-	//image_dma_init(image_test, image_test_length);
-	image_dma_init(image_nyan_start, image_nyan_start_length);
+	image_dma_init(image_test, image_test_length);
+	//image_dma_init(image_nyan_start, image_nyan_start_length);
 	led_spi_init();
 
 	// enable motor
 	GPIO_WriteBit(MOTOR_EN_PORT, MOTOR_EN_PIN, MOTOR_EN_SET_STATE);
-	set_motor_freq(NOTE_D);
+	//set_motor_freq(NOTE_D);
 	TIM_Cmd(TIM2, ENABLE);
 
 	while(1) {
@@ -86,6 +86,8 @@ int main(void) {
 
 		musictimer--;
 		frametimer--;			// systick configured to 1000 Hz -> counts milliseconds
+
+		delay_msec(500);
 	}
 
 	return 0;
