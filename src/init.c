@@ -195,7 +195,7 @@ void image_dma_init(const uint8_t *image_buffer, uint16_t image_length) {
 	dmaInitStructure.DMA_BufferSize = image_length;						// 64 bytes per line, depends on image data
 	dmaInitStructure.DMA_DIR = DMA_DIR_PeripheralDST;					// peripheral (GPIO) is destination
 	dmaInitStructure.DMA_M2M = DMA_M2M_Disable;
-	dmaInitStructure.DMA_MemoryBaseAddr = (uint32_t)image_buffer;		// transfer image data
+	dmaInitStructure.DMA_MemoryBaseAddr = (uint32_t)image_buffer+18;		// transfer image data
 	dmaInitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
 	dmaInitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
 	dmaInitStructure.DMA_Mode = DMA_Mode_Circular;
