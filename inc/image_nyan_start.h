@@ -5,7 +5,7 @@
 #define IMAGE_NYAN_START_H
 
 #include "stm32f10x.h"
-extern const uint8_t image_nyan_start[46720];
+extern const uint8_t image_nyan_start[28992];
 extern uint16_t image_nyan_start_length;
 
 #endif //define IMAGE_NYAN_START_H

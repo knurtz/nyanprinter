@@ -42,7 +42,7 @@ for l in range(0, image.height):
 	# print("Analyzing line " + str(l))
 	# we can color 64 pixels at once, so once we counted 64 black pixels we need to end the data block and return to the same position in the next pass
 	black_pixels = 0					# number of black pixels colored so far
-	x = 0							# current pixel in that line
+	x = 0								# current pixel in that line
 	current_bytes = [base_byte] * 64	# buffer for current data block
 
 	# go through all pixels for this line
@@ -58,8 +58,11 @@ for l in range(0, image.height):
 			# print("Starting new data block for line " + str(l))
 			sourcefile.write(s % tuple(map(to_binary_string, current_bytes)))		# write current bytes as new data block to source file
 			bytes = bytes + 64
-			current_bytes = [base_byte] * 60 + [base_byte_bw] * 4					# re-initialize for subsequent data blocks with inverted motor direction in the end of transmission (4 bytes for now, technically 1 should suffice)
 			black_pixels = 0
+			
+			# for now, end the conversion of this line after the first 64 black pixels have been written to output file.
+			break
+			current_bytes = [base_byte] * 60 + [base_byte_bw] * 4					# re-initialize for subsequent data blocks with inverted motor direction in the end of transmission (4 bytes for now, technically 1 should be enough)
 		
 		x = x + 1
 	

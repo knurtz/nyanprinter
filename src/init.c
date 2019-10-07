@@ -129,7 +129,7 @@ void motor_step_init() {
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 
 	TIM_TimeBaseInitTypeDef timerInitStructure;
-	timerInitStructure.TIM_Prescaler = 710;								// frequency for TIM2: 1 MHz
+	timerInitStructure.TIM_Prescaler = 71;								// frequency for TIM2: 1 MHz
 	timerInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
 	timerInitStructure.TIM_Period = 3000;								// default 500 Hz, motor speed can be updated with set_motor_freq(uint16_t hz) in helper.c
 	timerInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
@@ -153,7 +153,7 @@ void motor_step_init() {
 	NVIC_Init(&nvicStructure);
 
 	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);							// update interrupt: simultaneously with motor step
-	//TIM_ITConfig(TIM2, TIM_IT_CC1, ENABLE);								// CC1 interrupt: in between every motor step
+	//TIM_ITConfig(TIM2, TIM_IT_CC1, ENABLE);							// CC1 interrupt: in between every motor step
 
 }
 

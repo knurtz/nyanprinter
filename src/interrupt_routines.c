@@ -9,9 +9,12 @@
 #include "stm32f10x_conf.h"
 
 #include "pins.h"
+#include "image_nyan_loop.h"
+#include "init.h"
 
 
 volatile uint8_t cycle = 1;		// cycle = 1: send new image data, cycle = 0: activate strobe
+volatile uint8_t startframe_printed = 0;
 
 
 // TIM1 update (printer image data clock)
@@ -60,8 +63,15 @@ void DMA1_Channel2_IRQHandler() {
 	// this triggers whenever the image buffer has been transferred completely (all lines)
 	if (DMA_GetFlagStatus(DMA1_FLAG_TC2) != RESET) {
 		DMA_ClearFlag(DMA1_FLAG_TC2);
-
-		//GPIO_WriteBit(LED3_PORT, LED3_PIN, Bit_SET);		// toggle led for debugging
+		/*if (!startframe_printed) {
+			startframe_printed = 1;
+			//image_dma_init(image_nyan_loop, image_nyan_loop_length);
+			DMA_Cmd(DMA1_Channel2, DISABLE);
+			DMA1_Channel2->CNDTR = image_nyan_loop_length;
+			DMA1_Channel2->CMAR = (uint32_t)image_nyan_loop + 18;
+			DMA_Cmd(DMA1_Channel2, ENABLE);
+		}
+*/
 	}
 }
 

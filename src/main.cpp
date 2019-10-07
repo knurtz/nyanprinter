@@ -20,7 +20,7 @@
 #include "notes.h"
 
 #include "image_nyan_start.h"
-//#include "image_test.h"
+#include "image_nyan_loop.h"
 
 #define FRAMERATE				25
 #define FRAME_PERIOD			400
@@ -52,12 +52,11 @@ int main(void) {
 
 
 	// initialize some stuff
-	delay_init(DELAY_RESOLUTION_10_US);				// configures systick and systick handler, resets uptime counter
+	delay_init(DELAY_RESOLUTION_100_US);				// configures systick and systick handler, resets uptime counter
 	gpio_init();
 	printer_clk_init();
 	motor_step_init();
 	printer_strobe_init();
-	//image_dma_init(image_test, image_test_length);
 	image_dma_init(image_nyan_start, image_nyan_start_length);
 	led_spi_init();
 
@@ -87,7 +86,6 @@ int main(void) {
 		musictimer--;
 		frametimer--;			// systick configured to 1000 Hz -> counts milliseconds
 
-		delay_msec(500);
 	}
 
 	return 0;
