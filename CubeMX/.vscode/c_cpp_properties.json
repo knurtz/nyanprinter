@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "Embedded",
+            "includePath": [
+                "${workspaceFolder}/Core/Inc",
+                "${workspaceFolder}/User",
+                "${workspaceFolder}/Drivers/**"
+            ],
+            "defines": [
+                "USE_HAL_DRIVER",
+                "STM32F103xB"                
+            ],
+            "compilerArgs": [],
+            "cppStandard": "c++11",
+            "cStandard": "c11",
+            "intelliSenseMode": "gcc-arm",
+            "compilerPath": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\9 2020-q2-update\\bin\\arm-none-eabi-gcc.exe"
+        }
+    ],
+    "version": 4
+}

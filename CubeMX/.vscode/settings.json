@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "blinky.h": "c",
+        "system.h": "c",
+        "main.h": "c"
+    }
+}
