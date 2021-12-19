@@ -70,7 +70,7 @@ void Shell_ExecuteCommand(void)
     xprintf("Motor stopped\n");
   }
 
-  // Freq command
+  // Motor freq command
   else if (strstr(rec_buffer, "freq"))
   {
     uint16_t new_freq = strtol(rec_buffer + 4, NULL, 0);
@@ -78,9 +78,18 @@ void Shell_ExecuteCommand(void)
     xprintf("Frequency is now %i\n", new_freq);
   }
 
+  // Strobe command
+  else if (!strcmp(rec_buffer, "strobe"))
+  {
+    HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_SET);
+    HAL_TIM_Base_Start(&htim3);
+    xprintf("Strobe activated\n");
+  }
+
   else if (strstr(rec_buffer, "cnt"))
   {
     xprintf("TIM2->CNT: %i\n", TIM2->CNT);
+    xprintf("TIM3->CNT: %i\n", TIM3->CNT);
   }
 
   else xprintf("Unknown command.\n");
@@ -112,16 +121,4 @@ void xprintf(const char *fmt, ...)
 
   int len = strlen(buffer);
   HAL_UART_Transmit(&huart1, (uint8_t*)buffer, len, -1);
-}
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{ 
-  if (huart->Instance == USART1)
-  {
-    // Return error message
-    xprintf("Buffer overflow\n");
-
-    // and start over
-    Shell_Init();
-  }
 }

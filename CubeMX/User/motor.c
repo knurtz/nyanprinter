@@ -20,12 +20,3 @@ void Motor_SetFrequency(uint16_t freq)
     TIM2->ARR = 32000 / freq;
     TIM2->CCR1 = 16000 / freq;
 }
-
-
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  if (htim->Instance == TIM2)
-  {
-    HAL_GPIO_TogglePin(LED4_GPIO_Port, LED4_Pin);    
-  }
-}
